@@ -11,9 +11,9 @@ local themepark, theme, cfg = ...
 
 local gen_levels = { 'l', 'm', 's' }
 local gen_config = {
-    l = { minzoom = 10, maxzoom = 11 },
-    m = { minzoom =  8, maxzoom =  9 },
-    s = { minzoom =  6, maxzoom =  7 },
+    l = { minzoom = 10, maxzoom = 11, genzoom = 12 },
+    m = { minzoom =  8, maxzoom =  9, genzoom = 10 },
+    s = { minzoom =  6, maxzoom =  7, genzoom =  8 },
 }
 
 -- ---------------------------------------------------------------------------
@@ -22,7 +22,7 @@ local expire_levels = {}
 
 for _, level in ipairs(gen_levels) do
     expire_levels[level] = osm2pgsql.define_expire_output({
-        maxzoom = gen_config[level].maxzoom,
+        maxzoom = gen_config[level].genzoom,
         table = 'expire_water_polygons_' .. level
     })
 
@@ -247,7 +247,6 @@ end
 local name_list = table.concat(name_columns, ', ')
 
 themepark:add_proc('gen', function(data)
-    local zoom_levels = { s = 8, m = 10, l = 12 }
     for _, level in ipairs(gen_levels) do
         osm2pgsql.run_gen('raster-union', {
             schema = themepark.options.schema,
@@ -255,7 +254,7 @@ themepark:add_proc('gen', function(data)
             debug = false,
             src_table = 'water_polygons',
             dest_table = 'water_polygons_' .. level,
-            zoom = zoom_levels[level],
+            zoom = gen_config[level].genzoom,
             geom_column = 'geom',
             group_by_column = 'kind',
             margin = 0.0,
