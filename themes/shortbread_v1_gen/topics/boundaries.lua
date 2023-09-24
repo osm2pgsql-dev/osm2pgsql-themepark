@@ -204,6 +204,7 @@ INSERT INTO {schema}.boundaries_]] .. level .. [[_new
     SELECT * FROM simplified WHERE ST_Length(geom) > ]] .. c.minlength)
 
     table.insert(sql, 'ANALYZE {schema}.boundaries_' .. level .. '_new')
+    table.insert(sql, 'CREATE INDEX ON {schema}.boundaries_' .. level .. '_new USING GIST (geom)')
     table.insert(sql, 'DROP TABLE {schema}.boundaries_' .. level)
     table.insert(sql, 'ALTER TABLE {schema}.boundaries_' .. level .. '_new RENAME TO boundaries_' .. level)
 end
@@ -227,6 +228,7 @@ INSERT INTO {schema}.boundaries_new
 SELECT way_ids, relation_ids, admin_level, maritime, disputed, (ST_Dump(geom)).geom AS geom
     FROM multigeom ]],
         'ANALYZE {schema}.boundaries_new',
+        'CREATE INDEX ON {schema}.boundaries_new USING GIST (geom)',
         'DROP TABLE {schema}.boundaries',
         'ALTER TABLE {schema}.boundaries_new RENAME TO boundaries'
     }

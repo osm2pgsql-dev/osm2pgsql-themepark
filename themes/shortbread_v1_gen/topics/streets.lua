@@ -479,6 +479,7 @@ $$ LANGUAGE plpgsql]]),
             themepark.expand_template('SELECT osm2pgsql_shortbread_streets_med()'),
             themepark.expand_template('DROP FUNCTION osm2pgsql_shortbread_streets_med()'),
             themepark.expand_template('ANALYZE {schema}.streets_med_new'),
+            themepark.expand_template('CREATE INDEX ON {schema}.streets_med_new USING GIST (geom)'),
             themepark.expand_template('DROP TABLE {schema}.streets_med'),
             themepark.expand_template('ALTER TABLE {schema}.streets_med_new RENAME TO streets_med'),
         }
@@ -500,6 +501,7 @@ simplified AS
 INSERT INTO {schema}.streets_low_new (way_id, kind, ref, rail, minzoom, geom)
     SELECT * FROM simplified WHERE geom IS NOT NULL]]),
             themepark.expand_template('ANALYZE {schema}.streets_low_new'),
+            themepark.expand_template('CREATE INDEX ON {schema}.streets_low_new USING GIST (geom)'),
             themepark.expand_template('DROP TABLE {schema}.streets_low'),
             themepark.expand_template('ALTER TABLE {schema}.streets_low_new RENAME TO streets_low'),
         }

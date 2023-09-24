@@ -281,6 +281,7 @@ INSERT INTO {schema}.water_lines_gen_new (]] .. name_list .. [[, kind, tunnel, b
     SELECT * FROM simplified WHERE geom IS NOT NULL
 ]]),
             themepark.expand_template('ANALYZE {schema}.water_lines_gen_new'),
+            themepark.expand_template('CREATE INDEX ON {schema}.water_lines_gen_new USING GIST (geom)'),
             themepark.expand_template('DROP TABLE {schema}.water_lines_gen'),
             themepark.expand_template('ALTER TABLE {schema}.water_lines_gen_new RENAME TO water_lines_gen'),
             themepark.expand_template('TRUNCATE {schema}.expire_water_lines'),
