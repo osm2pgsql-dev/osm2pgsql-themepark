@@ -61,13 +61,14 @@ import() {
     local file="$3"
     local inlayer="$4"
 
-    ogr2ogr -f PostgreSQL "PG:dbname=$db" -overwrite -nln "$layer" \
+    ogr2ogr -f PostgreSQL "PG:dbname=$db" -overwrite -nln "${layer}_new" \
         -lco GEOMETRY_NAME=geom \
         -lco FID=id \
         -sql 'select "_ogr_geometry_" from '"$inlayer" \
         "/vsizip/$file.zip/$file"
 
-    psql --quiet -d "$DB" -c "ANALYZE $layer;"
+    psql --quiet -d "$DB" -c "ANALYZE ${layer}_new;"
+    psql --quiet -d "$DB" -c "BEGIN; DROP TABLE IF EXISTS $layer; ALTER TABLE ${layer}_new RENAME TO $layer; COMMIT;"
 }
 
 import_dataset() {
