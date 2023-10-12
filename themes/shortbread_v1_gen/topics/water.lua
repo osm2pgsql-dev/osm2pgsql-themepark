@@ -131,7 +131,7 @@ themepark:add_table{
 -- ---------------------------------------------------------------------------
 
 local check_waterway = osm2pgsql.make_check_values_func({
-    'river', 'canal', 'stream', 'ditch'
+    'river', 'canal', 'stream', 'ditch', 'drain'
 })
 
 local feet_per_meter = 3.2808399
@@ -183,7 +183,7 @@ themepark:add_proc('way', function(object, data)
             a.tunnel = true
         end
 
-        if a.kind == 'stream' or a.kind == 'ditch' then
+        if a.kind == 'stream' or a.kind == 'ditch' or a.kind == 'drain' then
             a.minzoom = 14
         else
             a.minzoom = 9

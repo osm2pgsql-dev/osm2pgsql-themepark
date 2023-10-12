@@ -9,7 +9,7 @@ local themepark, theme, cfg = ...
 
 -- ---------------------------------------------------------------------------
 
-local waterway_values = { "river", "canal", "stream", "ditch" }
+local waterway_values = { 'river', 'canal', 'stream', 'ditch', 'drain' }
 
 local bridge_values = {
     'yes', 'viaduct', 'boardwalk', 'cantilever', 'covered', 'low_water_crossing', 'movable', 'trestle'
@@ -118,7 +118,7 @@ themepark:add_proc('way', function(object, data)
             a.tunnel = true
         end
 
-        if a.kind == 'stream' or a.kind == 'ditch' then
+        if a.kind == 'stream' or a.kind == 'ditch' or a.kind == 'drain' then
             a.minzoom = 14
         else
             a.minzoom = 9
