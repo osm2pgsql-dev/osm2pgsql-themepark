@@ -282,6 +282,19 @@ function themepark:add_table(data)
         })
     end
 
+    if themepark.options.unique_id then
+        table.insert(data.columns, {
+            column = themepark.options.unique_id,
+            sql_type = 'bigserial',
+            create_only = true
+        })
+        table.insert(data.indexes, {
+            column = themepark.options.unique_id,
+            unique = true,
+            method = 'btree'
+        })
+    end
+
     if data.geom then
         if type(data.geom) == 'string' then
             data.geom_type = data.geom
