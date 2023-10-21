@@ -196,33 +196,34 @@ themepark:add_table{
 
 -- ---------------------------------------------------------------------------
 
-local Z_STEP = 14
+local Z_STEP_PER_LAYER = 100
 
 local highway_lookup = {
 --  highway tag          z  minzoom
-    motorway        = { 10,  5 },
-    trunk           = {  9,  6 },
-    primary         = {  8,  8 },
-    secondary       = {  7,  9 },
-    tertiary        = {  6, 10 },
+    motorway        = { 34,  5 },
+    trunk           = { 33,  6 },
+    primary         = { 32,  8 },
+    secondary       = { 31,  9 },
+    tertiary        = { 30, 10 },
 
-    tertiary_link   = {  5, 12 },
-    secondary_link  = {  5, 12 },
-    primary_link    = {  5, 12 },
-    trunk_link      = {  5, 12 },
-    motorway_link   = {  5, 12 },
+    unclassified    = { 20, 12 },
+    residential     = { 20, 12 },
+    busway          = { 20, 12 },
+    busway_guideway = { 20, 12 },
+    road            = { 20, 12 },
 
-    unclassified    = {  5, 12 },
-    residential     = {  5, 12 },
-    busway          = {  5, 12 },
-    busway_guideway = {  5, 12 },
-    road            = {  5, 12 },
+    tertiary_link   = { 10, 12 },
+    secondary_link  = { 10, 12 },
+    primary_link    = { 10, 12 },
+    trunk_link      = { 10, 12 },
+    motorway_link   = { 10, 12 },
 
     living_street   = {  4, 13 },
     pedestrian      = {  4, 13 },
-    service         = {  3, 13 },
 
-    track           = {  2, 13 },
+    service         = {  3, 13 },
+    track           = {  3, 13 },
+
     footway         = {  2, 13 },
     path            = {  2, 13 },
     cycleway        = {  2, 13 },
@@ -233,13 +234,13 @@ local highway_lookup = {
 }
 
 local railway_lookup = {
-    rail            = { 12,  8 },
-    narrow_gauge    = { 11,  8 },
-    tram            = { 11, 10 },
-    light_rail      = { 11, 10 },
-    funicular       = { 11, 10 },
-    subway          = { 11, 10 },
-    monorail        = { 11, 10 },
+    rail            = { 52,  8 },
+    narrow_gauge    = { 51,  8 },
+    tram            = { 51, 10 },
+    light_rail      = { 51, 10 },
+    funicular       = { 51, 10 },
+    subway          = { 51, 10 },
+    monorail        = { 51, 10 },
 }
 
 local aeroway_lookup = {
@@ -296,7 +297,7 @@ local process_as_area = function(object, data)
     local a = {
         layer = data.core.layer,
     }
-    a.z_order = Z_STEP * a.layer
+    a.z_order = Z_STEP_PER_LAYER * a.layer
 
     if t.highway == 'pedestrian' or t.highway == 'service' then
         a.kind = t.highway
@@ -308,19 +309,8 @@ local process_as_area = function(object, data)
 
     a.surface = t.surface
 
-    if as_bool(t.tunnel) or t.tunnel == 'building_passage' or t.covered == 'yes' then
-        a.tunnel = true
-        a.z_order = a.z_order - Z_STEP
-    else
-        a.tunnel = false
-    end
-
-    if as_bool(t.bridge) then
-        a.bridge = true
-        a.z_order = a.z_order + Z_STEP
-    else
-        a.bridge = false
-    end
+    a.tunnel = as_bool(t.tunnel) or t.tunnel == 'building_passage' or t.covered == 'yes'
+    a.bridge = as_bool(t.bridge)
 
     a.geom = object:as_polygon()
 
@@ -374,7 +364,7 @@ themepark:add_proc('way', function(object, data)
         a.bicycle = t.bicycle
         a.horse = t.horse
 
-        a.z_order = Z_STEP * a.layer + hwinfo[1]
+        a.z_order = Z_STEP_PER_LAYER * a.layer + hwinfo[1]
         a.minzoom = hwinfo[2]
     elseif t.railway then
         local rwinfo = railway_lookup[t.railway]
@@ -384,11 +374,11 @@ themepark:add_proc('way', function(object, data)
         a.kind = t.railway
         a.rail = true
         a.service = t.service
-        a.z_order = Z_STEP * a.layer + rwinfo[1]
+        a.z_order = Z_STEP_PER_LAYER * a.layer + rwinfo[1]
         a.minzoom = rwinfo[2]
         if a.minzoom == 8 and t.service then
             a.minzoom = 10
-            a.z_order = a.z_order + 1
+            a.z_order = a.z_order - 2
         end
     elseif t.aeroway then
         local awinfo = aeroway_lookup[t.aeroway]
@@ -396,25 +386,14 @@ themepark:add_proc('way', function(object, data)
             return
         end
         a.kind = t.aeroway
-        a.z_order = Z_STEP * a.layer
+        a.z_order = Z_STEP_PER_LAYER * a.layer
         a.minzoom = awinfo
     else
         return
     end
 
-    if as_bool(t.tunnel) or t.tunnel == 'building_passage' or t.covered == 'yes' then
-        a.tunnel = true
-        a.z_order = a.z_order - Z_STEP
-    else
-        a.tunnel = false
-    end
-
-    if as_bool(t.bridge) then
-        a.bridge = true
-        a.z_order = a.z_order + Z_STEP
-    else
-        a.bridge = false
-    end
+    a.tunnel = as_bool(t.tunnel) or t.tunnel == 'building_passage' or t.covered == 'yes'
+    a.bridge = as_bool(t.bridge)
 
     set_ref_attributes(a, t)
 
