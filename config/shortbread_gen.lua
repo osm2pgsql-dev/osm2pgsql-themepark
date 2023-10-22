@@ -15,7 +15,7 @@ themepark:set_option('tags', 'all_tags')
 
 -- Set this to add a column 'id' with unique IDs (and corresponding unique
 -- index). This is needed for instance when you want to edit the data in QGIS.
---themepark:set_option('unique_id', 'id')
+themepark:set_option('unique_id', 'id')
 
 -- ---------------------------------------------------------------------------
 
