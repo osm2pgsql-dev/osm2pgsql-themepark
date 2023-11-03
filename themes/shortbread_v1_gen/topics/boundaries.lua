@@ -193,15 +193,15 @@ end)
 local function gen_commands(sql, level)
     local c = gen_config[level]
 
-    table.insert(sql, 'CREATE TABLE {schema}.boundaries_' .. level .. '_new (LIKE {schema}.boundaries_' .. level .. ')')
+    table.insert(sql, 'CREATE TABLE {schema}.boundaries_' .. level .. '_new (LIKE {schema}.boundaries_' .. level .. ' INCLUDING IDENTITY)')
 
     table.insert(sql, [[
 WITH simplified AS (
     SELECT way_ids, relation_ids, admin_level, maritime, disputed, ST_SimplifyVW(geom, ]] .. c.simplify .. [[) AS geom
         FROM {schema}.boundaries ]] .. c.condition .. [[
 )
-INSERT INTO {schema}.boundaries_]] .. level .. [[_new
-    SELECT * FROM simplified WHERE ST_Length(geom) > ]] .. c.minlength)
+INSERT INTO {schema}.boundaries_]] .. level .. [[_new (way_ids, relation_ids, admin_level, maritime, disputed, geom)
+    SELECT way_ids, relation_ids, admin_level, maritime, disputed, geom FROM simplified WHERE ST_Length(geom) > ]] .. c.minlength)
 
     table.insert(sql, 'ANALYZE {schema}.boundaries_' .. level .. '_new')
     table.insert(sql, 'CREATE INDEX ON {schema}.boundaries_' .. level .. '_new USING GIST (geom)')
@@ -211,7 +211,7 @@ end
 
 themepark:add_proc('gen', function(data)
     local sql = {
-        'CREATE TABLE {schema}.boundaries_new (LIKE {schema}.boundaries)',
+        'CREATE TABLE {schema}.boundaries_new (LIKE {schema}.boundaries INCLUDING IDENTITY)',
         [[
 WITH multigeom AS (
 SELECT array_agg(way_id ORDER BY way_id) AS way_ids,
@@ -224,7 +224,7 @@ SELECT array_agg(way_id ORDER BY way_id) AS way_ids,
         WHERE closure_segment IS FALSE
         GROUP BY relation_ids, maritime OR coastline, disputed
 )
-INSERT INTO {schema}.boundaries_new
+INSERT INTO {schema}.boundaries_new (way_ids, relation_ids, admin_level, maritime, disputed, geom)
 SELECT way_ids, relation_ids, admin_level, maritime, disputed, (ST_Dump(geom)).geom AS geom
     FROM multigeom ]],
         'ANALYZE {schema}.boundaries_new',

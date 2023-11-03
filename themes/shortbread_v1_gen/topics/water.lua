@@ -268,7 +268,7 @@ themepark:add_proc('gen', function(data)
         if_has_rows = themepark.expand_template('SELECT 1 FROM {schema}.expire_water_lines LIMIT 1'),
         transaction = true,
         sql = {
-            themepark.expand_template('CREATE TABLE {schema}.water_lines_gen_new (LIKE {schema}.water_lines_gen)'),
+            themepark.expand_template('CREATE TABLE {schema}.water_lines_gen_new (LIKE {schema}.water_lines_gen INCLUDING IDENTITY)'),
             themepark.expand_template([[
 WITH merged AS
     (SELECT ]] .. name_list .. [[, kind, tunnel, bridge, ST_LineMerge(ST_Collect(geom)) AS geom

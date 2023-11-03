@@ -424,7 +424,7 @@ themepark:add_proc('gen', function(data)
         description = 'Merge street lines for medium zoom levels',
         transaction = true,
         sql = {
-            themepark.expand_template('CREATE TABLE {schema}.streets_med_new (LIKE {schema}.streets_med)'),
+            themepark.expand_template('CREATE TABLE {schema}.streets_med_new (LIKE {schema}.streets_med INCLUDING IDENTITY)'),
             themepark.expand_template([[
 CREATE OR REPLACE FUNCTION osm2pgsql_shortbread_streets_med() RETURNS void AS $$
 DECLARE
@@ -469,7 +469,7 @@ $$ LANGUAGE plpgsql]]),
         description = 'Merge street lines for low zoom levels',
         transaction = true,
         sql = {
-            themepark.expand_template('CREATE TABLE {schema}.streets_low_new (LIKE {schema}.streets_low)'),
+            themepark.expand_template('CREATE TABLE {schema}.streets_low_new (LIKE {schema}.streets_low INCLUDING IDENTITY)'),
             themepark.expand_template([[
 WITH
 merged AS
