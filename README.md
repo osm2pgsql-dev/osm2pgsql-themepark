@@ -141,7 +141,7 @@ command provided with newer osm2pgsql versions.
 
 ## License
 
-Copyright 2023 Jochen Topf <jochen@topf.org>
+Copyright 2024 Jochen Topf <jochen@topf.org>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
