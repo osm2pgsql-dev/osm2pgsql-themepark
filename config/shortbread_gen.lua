@@ -18,6 +18,8 @@ themepark:set_option('tags', 'all_tags')
 themepark:set_option('unique_id', 'id')
 
 -- ---------------------------------------------------------------------------
+-- Choose which names from which languages to use in the map.
+-- See 'themes/core/README.md' for details.
 
 -- themepark:add_topic('core/name-single', { column = 'name' })
 -- themepark:add_topic('core/name-list', { keys = {'name', 'name:de', 'name:en'} })
@@ -29,6 +31,8 @@ themepark:add_topic('core/name-with-fallback', {
         name_en = { 'name:en', 'name', 'name:de' },
     }
 })
+
+-- --------------------------------------------------------------------------
 
 themepark:add_topic('core/layer')
 
@@ -56,37 +60,44 @@ themepark:add_topic('shortbread_v1/addresses')
 
 -- ---------------------------------------------------------------------------
 
+-- Create config files only in create mode, not when updating the database.
+-- This protects the file in case it contains manual edits.
 if osm2pgsql.mode == 'create' then
-    themepark:plugin('t-rex'):write_config('t-rex-config.toml', {
-        tileset = 'osm',
-        extra_layers = {
-            {
-                buffer_size = 10,
-                name = 'street_labels',
-                geometry_type = 'LINESTRING',
-                query = {
-                    {
-                        minzoom = 14,
-                        sql = [[
-SELECT "name","name_de","name_en","kind","layer","ref","ref_rows","ref_cols","z_order","geom"
-    FROM "streets"
-    WHERE "geom" && !bbox! AND !zoom! >= "minzoom"
-    ORDER BY "z_order" asc]]
-                    },
-                    {
-                        minzoom = 11,
-                        maxzoom = 13,
-                        sql = [[
-SELECT "name","name_de","name_en","kind","layer","ref","ref_rows","ref_cols","z_order","geom"
-    FROM "streets_med"
-    WHERE "geom" && !bbox! AND !zoom! >= "minzoom"
-    ORDER BY "z_order" asc]]
-                    },
-                }
-            }
-        }
-    })
+-- Enable if you want to create a config file for the T-Rex tile server
+--
+--     themepark:plugin('t-rex'):write_config('t-rex-config.toml', {
+--         tileset = 'osm',
+--         extra_layers = {
+--             {
+--                 buffer_size = 10,
+--                 name = 'street_labels',
+--                 geometry_type = 'LINESTRING',
+--                 query = {
+--                     {
+--                         minzoom = 14,
+--                         sql = [[
+-- SELECT "name","name_de","name_en","kind","layer","ref","ref_rows","ref_cols","z_order","geom"
+--     FROM "streets"
+--     WHERE "geom" && !bbox! AND !zoom! >= "minzoom"
+--     ORDER BY "z_order" asc]]
+--                     },
+--                     {
+--                         minzoom = 11,
+--                         maxzoom = 13,
+--                         sql = [[
+-- SELECT "name","name_de","name_en","kind","layer","ref","ref_rows","ref_cols","z_order","geom"
+--     FROM "streets_med"
+--     WHERE "geom" && !bbox! AND !zoom! >= "minzoom"
+--     ORDER BY "z_order" asc]]
+--                     },
+--                 }
+--             }
+--         }
+--     })
 
+-- Enable if you want to create a config file for the Tilekiln tile server.
+-- (You must also create the directory 'tk'.)
+--
 --    themepark:plugin('tilekiln'):write_config('tk')
 end
 

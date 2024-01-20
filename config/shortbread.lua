@@ -14,6 +14,8 @@ themepark.debug = false
 themepark:set_option('tags', 'all_tags')
 
 -- ---------------------------------------------------------------------------
+-- Choose which names from which languages to use in the map.
+-- See 'themes/core/README.md' for details.
 
 -- themepark:add_topic('core/name-single', { column = 'name' })
 -- themepark:add_topic('core/name-list', { keys = {'name', 'name:de', 'name:en'} })
@@ -25,6 +27,8 @@ themepark:add_topic('core/name-with-fallback', {
         name_en = { 'name:en', 'name', 'name:de' },
     }
 })
+
+-- --------------------------------------------------------------------------
 
 themepark:add_topic('core/layer')
 
@@ -52,13 +56,20 @@ themepark:add_topic('shortbread_v1/addresses')
 
 -- ---------------------------------------------------------------------------
 
+-- Create config files only in create mode, not when updating the database.
+-- This protects the file in case it contains manual edits.
 if osm2pgsql.mode == 'create' then
-    themepark:plugin('t-rex'):write_config('t-rex-config.toml', {
-        tileset = 'osm',
-    })
+-- Enable if you want to create a config file for the T-Rex tile server.
+--
+--    themepark:plugin('t-rex'):write_config('t-rex-config.toml', {})
 
+-- Enable if you want to create a config file for the Tilekiln tile server.
+-- (You must also create the directory 'tk'.)
+--
 --    themepark:plugin('tilekiln'):write_config('tk')
 
+-- Enable if you want to create a taginfo project file.
+--
 --    themepark:plugin('taginfo'):write_config('taginfo-shortbread', {
 --        project = { name = 'shortbread' }
 --    })
