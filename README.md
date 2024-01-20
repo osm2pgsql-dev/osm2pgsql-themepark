@@ -30,12 +30,55 @@ how to create one yourself.
 The framework has support for plugins adding some functionality. They are in
 the `lua/themepark/plugins` directory.
 
-Available plugins are:
-* `taginfo`: For creating [Taginfo project files]().
-* `tilekiln`: For creating a config file for the
-  [Tilekiln](https://github.com/pnorman/tilekiln) tile server.
-* `t-rex`: For creating a config file for the
-  [T-Rex](https://t-rex.tileserver.ch/) tile server.
+Available plugins are `taginfo`, `tilekiln`, and `t-rex`.
+
+### Plugin `taginfo`
+
+For creating [Taginfo project
+files](https://wiki.openstreetmap.org/wiki/Taginfo/Projects). The generated
+files are incomplete, they are intended as starting point only.
+
+### Plugin `tilekiln`
+
+For creating a config file for the
+[Tilekiln](https://github.com/pnorman/tilekiln) tile server.
+
+Call like this from your config file to create a config in the `tk` directory
+(the directory must exist):
+
+```
+themepark:plugin('tilekiln'):write_config('tk')
+```
+
+A second argument on the `write_config()` function can contain a Lua table
+with options. Available options are:
+
+* `tileset`: Name of the tileset, defaults to `osm`.
+* `attribution`: Set attribution string, defaults to the setting from the
+  themepark config file.
+
+### Plugin `t-rex`
+
+This plugin can be used to create a config file for the
+[T-Rex](https://t-rex.tileserver.ch/) tile server.
+
+You need the Lua `toml` module installed for this plugin.
+
+Call like this from your config file to create a file called
+`t-rex-config.toml`:
+
+```
+themepark:plugin('t-rex'):write_config('t-rex-config.toml')
+```
+
+A second argument on the `write_config()` function can contain a Lua table
+with options. Available options are:
+
+* `tileset`: Name of the tileset, defaults to `osm`.
+* `attribution`: Set attribution string, defaults to the setting from the
+  themepark config file.
+* `extra_layers`: Extra layers that should be added to the config file. Use
+  the same structure as the T-Rex config file would use.
 
 ## Themes
 
