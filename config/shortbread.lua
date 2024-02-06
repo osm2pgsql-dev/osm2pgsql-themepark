@@ -64,9 +64,13 @@ if osm2pgsql.mode == 'create' then
 --    themepark:plugin('t-rex'):write_config('t-rex-config.toml', {})
 
 -- Enable if you want to create a config file for the Tilekiln tile server.
--- (You must also create the directory 'tk'.)
+-- (You must also create the directory 'shortbread_config'.)
 --
---    themepark:plugin('tilekiln'):write_config('tk')
+--     themepark:plugin('tilekiln'):write_config('shortbread_config', {
+--         tileset = 'shortbread_v1',
+--         name = 'OpenStreetMap Shortbread',
+--         attribution = '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a>'
+--     })
 
 -- Enable if you want to create a taginfo project file.
 --

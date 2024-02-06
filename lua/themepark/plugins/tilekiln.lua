@@ -106,10 +106,10 @@ function plugin:write_config(directory, options)
 
     local config = {
         metadata = {
-            id = 'v1',
-            name = options.tileset or 'osm',
+            id = options.tileset or 'mytiles',
+            name = options.name,
             attribution = options.attribution or plugin.themepark.options.attribution,
-            version = '0.0.1',
+            version = options.version,
         },
         vector_layers = {}
     }
