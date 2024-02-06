@@ -33,10 +33,10 @@ local lyaml = require 'lyaml'
 
 function plugin:build_sublayer_config(main_layer, sub_layer)
     local config = {
-        minzoom = sub_layer.tiles.minzoom or 0,
-        maxzoom = sub_layer.tiles.maxzoom or 14,
-        extent = sub_layer.tiles.extent or 4096,
-        buffer = sub_layer.tiles.buffer_size or 10,
+        minzoom = sub_layer.tiles.minzoom or self.minzoom,
+        maxzoom = sub_layer.tiles.maxzoom or self.maxzoom,
+        extent = sub_layer.tiles.extent,
+        buffer = sub_layer.tiles.buffer_size,
     }
 
     local mvt = 'ST_AsMVTGeom("' .. sub_layer.geom_column .. '", {{unbuffered_bbox}}, {{extent}}, {{buffer}}) AS way'
@@ -99,6 +99,8 @@ end
 
 function plugin:write_config(directory, options)
     self.directory = directory
+    self.minzoom = options.minzoom or 0
+    self.maxzoom = options.maxzoom or 14
 
     if not options then
         options = {}
