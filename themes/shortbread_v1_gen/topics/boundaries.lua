@@ -193,7 +193,8 @@ end)
 local function gen_commands(sql, level)
     local c = gen_config[level]
 
-    table.insert(sql, 'CREATE TABLE {schema}.boundaries_' .. level .. '_new (LIKE {schema}.boundaries_' .. level .. ' INCLUDING IDENTITY)')
+    table.insert(sql, 'CREATE TABLE {schema}.boundaries_' .. level ..
+                      '_new (LIKE {schema}.boundaries_' .. level .. ' INCLUDING IDENTITY)')
 
     table.insert(sql, [[
 WITH simplified AS (
@@ -201,7 +202,8 @@ WITH simplified AS (
         FROM {schema}.boundaries ]] .. c.condition .. [[
 )
 INSERT INTO {schema}.boundaries_]] .. level .. [[_new (way_ids, relation_ids, admin_level, maritime, disputed, geom)
-    SELECT way_ids, relation_ids, admin_level, maritime, disputed, geom FROM simplified WHERE ST_Length(geom) > ]] .. c.minlength)
+    SELECT way_ids, relation_ids, admin_level, maritime, disputed, geom
+    FROM simplified WHERE ST_Length(geom) > ]] .. c.minlength)
 
     table.insert(sql, 'ANALYZE {schema}.boundaries_' .. level .. '_new')
     table.insert(sql, 'CREATE INDEX ON {schema}.boundaries_' .. level .. '_new USING GIST (geom)')

@@ -6,6 +6,12 @@
 --
 -- ---------------------------------------------------------------------------
 
+-- Set these to true in order to create a config file
+-- If you are creating a tilekiln config you must also create
+-- the 'shortbread_config' directory.
+local TREX = false
+local TILEKILN = false
+
 local themepark = require('themepark')
 
 themepark.debug = false
@@ -63,46 +69,44 @@ themepark:add_topic('shortbread_v1/addresses')
 -- Create config files only in create mode, not when updating the database.
 -- This protects the file in case it contains manual edits.
 if osm2pgsql.mode == 'create' then
--- Enable if you want to create a config file for the T-Rex tile server
---
---     themepark:plugin('t-rex'):write_config('t-rex-config.toml', {
---         tileset = 'osm',
---         extra_layers = {
---             {
---                 buffer_size = 10,
---                 name = 'street_labels',
---                 geometry_type = 'LINESTRING',
---                 query = {
---                     {
---                         minzoom = 14,
---                         sql = [[
--- SELECT "name","name_de","name_en","kind","layer","ref","ref_rows","ref_cols","z_order","geom"
---     FROM "streets"
---     WHERE "geom" && !bbox! AND !zoom! >= "minzoom"
---     ORDER BY "z_order" asc]]
---                     },
---                     {
---                         minzoom = 11,
---                         maxzoom = 13,
---                         sql = [[
--- SELECT "name","name_de","name_en","kind","layer","ref","ref_rows","ref_cols","z_order","geom"
---     FROM "streets_med"
---     WHERE "geom" && !bbox! AND !zoom! >= "minzoom"
---     ORDER BY "z_order" asc]]
---                     },
---                 }
---             }
---         }
---     })
-
--- Enable if you want to create a config file for the Tilekiln tile server.
--- (You must also create the directory 'shortbread_config'.)
---
---     themepark:plugin('tilekiln'):write_config('shortbread_config', {
---         tileset = 'shortbread_v1',
---         name = 'OpenStreetMap Shortbread',
---         attribution = '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a>'
---     })
+    if TREX then
+        themepark:plugin('t-rex'):write_config('t-rex-config.toml', {
+            tileset = 'osm',
+            extra_layers = {
+                {
+                    buffer_size = 10,
+                    name = 'street_labels',
+                    geometry_type = 'LINESTRING',
+                    query = {
+                        {
+                            minzoom = 14,
+                            sql = [[
+SELECT "name","name_de","name_en","kind","layer","ref","ref_rows","ref_cols","z_order","geom"
+    FROM "streets"
+    WHERE "geom" && !bbox! AND !zoom! >= "minzoom"
+    ORDER BY "z_order" asc]]
+                        },
+                        {
+                            minzoom = 11,
+                            maxzoom = 13,
+                            sql = [[
+SELECT "name","name_de","name_en","kind","layer","ref","ref_rows","ref_cols","z_order","geom"
+    FROM "streets_med"
+    WHERE "geom" && !bbox! AND !zoom! >= "minzoom"
+    ORDER BY "z_order" asc]]
+                        },
+                    }
+                }
+            }
+        })
+    end
+    if TILEKILN then
+        themepark:plugin('tilekiln'):write_config('shortbread_config', {
+            tileset = 'shortbread_v1',
+            name = 'OpenStreetMap Shortbread',
+            attribution = '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a>'
+        })
+    end
 end
 
 -- ---------------------------------------------------------------------------
