@@ -18,7 +18,7 @@ themepark:add_table{
         { key = 'waterway', value = 'dam', on = 'w' },
     },
     tiles = {
-        minzoom = 14,
+        minzoom = 12,
     },
 }
 
@@ -26,14 +26,14 @@ themepark:add_table{
     name = 'dam_polygons',
     ids_type = 'way',
     geom = 'polygon',
-    columns = themepark:columns('core/name', {
+    columns = themepark:columns({
         { column = 'kind', type = 'text', not_null = true },
     }),
     tags = {
         { key = 'waterway', value = 'dam', on = 'a' },
     },
     tiles = {
-        minzoom = 14,
+        minzoom = 12,
     },
 }
 
@@ -49,7 +49,6 @@ themepark:add_proc('way', function(object, data)
 
     if waterway == 'dam' then
         local a = { kind = waterway }
-        themepark.themes.core.add_name(a, object)
         a.geom = object.as_linestring()
         themepark:insert('dam_lines', a, t)
     end
@@ -61,7 +60,6 @@ themepark:add_proc('area', function(object, data)
 
     if waterway == 'dam' then
         local a = { kind = waterway }
-        themepark.themes.core.add_name(a, object)
 
         for sgeom in object.as_area():geometries() do
             a.geom = sgeom
