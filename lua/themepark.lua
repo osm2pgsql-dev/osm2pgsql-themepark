@@ -336,7 +336,11 @@ end
 -- ---------------------------------------------------------------------------
 -- ---------------------------------------------------------------------------
 function themepark:get_table(table_name)
-    return self.tables[table_name]
+    local dbtable = self.tables[table_name]
+    if not dbtable then
+        error("Unknown table '" .. table_name .. "'", 2)
+    end
+    return dbtable
 end
 
 function themepark:add_debug_info(attrs, tags, dbgdata)
