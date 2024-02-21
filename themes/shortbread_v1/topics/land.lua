@@ -40,6 +40,7 @@ local landuse_lookup = {
 }
 
 local natural_lookup = {
+    wood = 7, -- natural=wood has special handling to turn it into forest
     sand = 10,
     beach = 10,
     heath = 11,
@@ -84,6 +85,7 @@ themepark:add_table{
         { key = 'landuse', values = landuse_values, on = 'a' },
         { key = 'leisure', values = leisure_values, on = 'a' },
         { key = 'natural', values = natural_values, on = 'a' },
+        { key = 'amenity', values = {"grave_yard"}, on = 'a' },
         { key = 'wetland', values = wetland_values, on = 'a' },
     },
     tiles = {
@@ -112,17 +114,20 @@ themepark:add_proc('area', function(object, data)
         if minzoom then
             a.kind = t.natural
             a.minzoom = minzoom
-        else
+        end
+        if not a.minzoom or a.kind == 'wetland' then
             local wetland = check_wetland(t.wetland)
             if wetland then
                 a.kind = wetland
                 a.minzoom = 11
-            else
-                local leisure = check_leisure(t.leisure)
-                if leisure then
-                    a.kind = leisure
-                    a.minzoom = 11
-                end
+            end
+        end
+        -- catch anything not processed above
+        if not a.minzoom then
+            local leisure = check_leisure(t.leisure)
+            if leisure then
+                a.kind = leisure
+                a.minzoom = 11
             end
         end
     end
