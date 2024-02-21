@@ -308,7 +308,7 @@ function themepark:add_table(data)
         table.insert(data.columns, {
             column = data.geom_column,
             type = data.geom_type,
-            srid = themepark.options.srid,
+            projection = self.options.srid,
             expire = data.expire,
             not_null = true
         })
