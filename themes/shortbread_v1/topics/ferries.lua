@@ -13,7 +13,6 @@ themepark:add_table{
     geom = 'linestring',
     columns = themepark:columns('core/name', {
         { column = 'kind', type = 'text', not_null = true },
-        { column = 'motor_vehicle', type = 'bool' },
         { column = 'minzoom', type = 'int', tiles = 'minzoom' },
     }),
     tags = {
@@ -37,10 +36,8 @@ themepark:add_proc('way', function(object, data)
         }
 
         if t.motor_vehicle and t.motor_vehicle ~= 'no' then
-            a.motor_vehicle = true
             a.minzoom = 10
         else
-            a.motor_vehicle = false
             a.minzoom = 12
         end
 
