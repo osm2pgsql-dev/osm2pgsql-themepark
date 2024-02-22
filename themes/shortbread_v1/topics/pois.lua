@@ -177,7 +177,7 @@ themepark:add_proc('node', function(object, data)
     if a then
         a.geom = object:as_point()
         themepark:insert('pois', a)
-        data.in_pois = true
+        data.shortbread_in_pois = true
     end
 end)
 
@@ -186,7 +186,7 @@ themepark:add_proc('area', function(object, data)
     if a then
         a.geom = object:as_area():centroid()
         themepark:insert('pois', a)
-        data.in_pois = true
+        data.shortbread_in_pois = true
     end
 end)
 
