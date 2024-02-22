@@ -154,7 +154,6 @@ local get_attributes = function(object)
                 add_extra_attributes[k](a, t)
             end
             is_poi = true
-            break
         end
     end
 
