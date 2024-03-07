@@ -182,6 +182,18 @@ themepark:add_table{
 }
 
 themepark:add_table{
+    name = 'streets_polygons_labels',
+    ids_type = 'area',
+    geom = 'point',
+    columns = themepark:columns('core/name', {
+        { column = 'kind', type = 'text', not_null = true },
+    }),
+    tiles = {
+        minzoom = 11
+    },
+}
+
+themepark:add_table{
     name = 'streets_labels_points',
     ids_type = 'node',
     geom = 'point',
@@ -315,8 +327,14 @@ local process_as_area = function(object, data)
 
     a.geom = object:as_polygon()
 
-    themepark.themes.core.add_name(a, object)
-    themepark:insert('street_polygons', a, t)
+    if themepark.themes.core.add_name(a, object) then
+        local g = a.geom:transform(3857)
+        themepark:insert('street_polygons', a, t)
+        a.geom = g:pole_of_inaccessibility()
+        themepark:insert('streets_polygons_labels', a, t)
+    else
+        themepark:insert('street_polygons', a, t)
+    end
 end
 
 themepark:add_proc('way', function(object, data)
