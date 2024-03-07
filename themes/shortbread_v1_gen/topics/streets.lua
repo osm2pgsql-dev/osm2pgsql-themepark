@@ -325,15 +325,13 @@ local process_as_area = function(object, data)
     a.tunnel = as_bool(t.tunnel) or t.tunnel == 'building_passage' or t.covered == 'yes'
     a.bridge = as_bool(t.bridge)
 
-    a.geom = object:as_polygon()
+    a.geom = object:as_polygon():transform(3857)
+    local has_name = themepark.themes.core.add_name(a, object)
+    themepark:insert('street_polygons', a, t)
 
-    if themepark.themes.core.add_name(a, object) then
-        local g = a.geom:transform(3857)
-        themepark:insert('street_polygons', a, t)
-        a.geom = g:pole_of_inaccessibility()
+    if has_name then
+        a.geom = a.geom:pole_of_inaccessibility()
         themepark:insert('streets_polygons_labels', a, t)
-    else
-        themepark:insert('street_polygons', a, t)
     end
 end
 
