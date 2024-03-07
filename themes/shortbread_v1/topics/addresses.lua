@@ -41,7 +41,7 @@ end
 
 themepark:add_proc('node', function(object, data)
     -- Shortbread spec: Ignore addresses that are already in "pois" layer.
-    if data.in_pois then
+    if data.shortbread_in_pois then
         return
     end
 
@@ -54,7 +54,7 @@ end)
 
 themepark:add_proc('way', function(object, data)
     -- Shortbread spec: Ignore addresses that are already in "pois" layer.
-    if data.in_pois or not object.is_closed then
+    if data.shortbread_in_pois or not object.is_closed then
         return
     end
 
@@ -67,7 +67,7 @@ end)
 
 themepark:add_proc('relation', function(object, data)
     -- Shortbread spec: Ignore addresses that are already in "pois" layer.
-    if data.in_pois then
+    if data.shortbread_in_pois then
         return
     end
 

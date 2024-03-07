@@ -27,13 +27,13 @@ themepark:add_table{
         { column = 'sport', type = 'text' },
         { column = 'vending', type = 'text' },
         { column = 'information', type = 'text' },
-        { column = 'tower_type', type = 'text' },
+        { column = 'tower:type', type = 'text' },
         { column = 'religion', type = 'text' },
         { column = 'denomination', type = 'text' },
-        { column = 'recycling_glass_bottles', type = 'bool' },
-        { column = 'recycling_paper', type = 'bool' },
-        { column = 'recycling_clothes', type = 'bool' },
-        { column = 'recycling_scrap_metal', type = 'bool' },
+        { column = 'recycling:glass_bottles', type = 'bool' },
+        { column = 'recycling:paper', type = 'bool' },
+        { column = 'recycling:clothes', type = 'bool' },
+        { column = 'recycling:scrap_metal', type = 'bool' },
         { column = 'atm', type = 'bool' },
     }),
     tags = {
@@ -117,10 +117,10 @@ add_extra_attributes.amenity = function(a, t)
            t.amenity == 'pub' or t.amenity == 'bar' or t.amenity == 'cafe' then
         a.cuisine = t.cuisine
     elseif t.amenity == 'recycling' then
-        a.recycling_glass_bottles = t['recycling:glass_bottles'] == 'yes'
-        a.recycling_paper = t['recycling:paper'] == 'yes'
-        a.recycling_clothes = t['recycling:clothes'] == 'yes'
-        a.recycling_scrap_metal = t['recycling:scrap_metal'] == 'yes'
+        a['recycling:glass_bottles'] = t['recycling:glass_bottles'] == 'yes'
+        a['recycling:paper'] = t['recycling:paper'] == 'yes'
+        a['recycling:clothes'] = t['recycling:clothes'] == 'yes'
+        a['recycling:scrap_metal'] = t['recycling:scrap_metal'] == 'yes'
     elseif t.amenity == 'bank' then
         a.atm = t.atm == 'yes'
     end
@@ -134,7 +134,7 @@ end
 
 add_extra_attributes.man_made = function(a, t)
     if t.man_made == 'tower' then
-        a.tower_type = t['tower:type']
+        a['tower:type'] = t['tower:type']
     end
 end
 
@@ -154,7 +154,6 @@ local get_attributes = function(object)
                 add_extra_attributes[k](a, t)
             end
             is_poi = true
-            break
         end
     end
 
@@ -178,7 +177,7 @@ themepark:add_proc('node', function(object, data)
     if a then
         a.geom = object:as_point()
         themepark:insert('pois', a)
-        data.in_pois = true
+        data.shortbread_in_pois = true
     end
 end)
 
@@ -187,7 +186,7 @@ themepark:add_proc('area', function(object, data)
     if a then
         a.geom = object:as_area():centroid()
         themepark:insert('pois', a)
-        data.in_pois = true
+        data.shortbread_in_pois = true
     end
 end)
 
