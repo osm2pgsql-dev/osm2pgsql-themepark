@@ -11,8 +11,8 @@ themepark:add_table{
     name = 'boundaries',
     ids_type = 'way',
     geom = 'linestring',
-    columns = themepark:columns('core/name', {
-        { column = 'admin_level', type = 'int' },
+    columns = themepark:columns({
+        { column = 'admin_level', type = 'int', not_null = true },
         { column = 'maritime', type = 'bool' },
         { column = 'disputed', type = 'bool' },
     }),
@@ -33,24 +33,27 @@ local rinfos = {}
 
 -- ---------------------------------------------------------------------------
 
+-- Check the (string) admin level. Change this depending on which admin
+-- levels you want to process. Shortbread only shows 2 and 4.
+-- valid values must work with tonumber!
+local function valid_admin_level(level)
+    return level == '2' or level == '4'
+end
+
 -- Check if this looks like a boundary and return admin_level as number
--- Return nil if this is not a valid boundary.
+-- Return nil if this is not a valid administrative boundary.
 local function get_admin_level(tags)
     local type = tags.type
 
     if type == 'boundary' or type == 'multipolygon' then
         local boundary = tags.boundary
-        if boundary == 'administrative' or boundary == 'disputed' then
+        if boundary == 'administrative' and valid_admin_level(tags.admin_level)
+            or boundary == 'disputed' then
             return tonumber(tags.admin_level)
         end
     end
 end
 
--- Check the (numeric) admin level. Change this depending on which admin
--- levels you want to process. Shortbread only shows 2 and 4.
-local function valid_admin_level(level)
-    return level == 2 or level == 4
-end
 
 -- ---------------------------------------------------------------------------
 
@@ -76,7 +79,9 @@ themepark:add_proc('way', function(object, data)
 end)
 
 themepark:add_proc('select_relation_members', function(relation)
-    if valid_admin_level(get_admin_level(relation.tags)) then
+    -- It isn't necessary to process boundary=disputed relations separately because
+    -- if they have an admin_level from another relation they will get added anyways.
+    if valid_admin_level(relation.tags.admin_level) then
         return { ways = osm2pgsql.way_member_ids(relation) }
     end
 end)
