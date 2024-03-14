@@ -47,13 +47,17 @@ local function get_admin_level(tags)
 
     if type == 'boundary' or type == 'multipolygon' then
         local boundary = tags.boundary
-        if boundary == 'administrative' and valid_admin_level(tags.admin_level)
-            or boundary == 'disputed' then
+        if boundary == 'administrative' and valid_admin_level(tags.admin_level) then
             return tonumber(tags.admin_level)
         end
     end
 end
 
+
+local function valid_disputed(tags)
+    local type = tags.type
+    return (type == 'boundary' or type == 'multipolygon') and tags.boundary == 'disputed'
+end
 
 -- ---------------------------------------------------------------------------
 
@@ -68,6 +72,9 @@ themepark:add_proc('way', function(object, data)
     end
 
     local t = object.tags
+    if not info.admin_level then
+        return
+    end
     local a = {
         admin_level = info.admin_level,
         maritime = (t.maritime and (t.maritime == 'yes' or t.natural == 'coastline')),
@@ -90,19 +97,21 @@ themepark:add_proc('relation', function(object, data)
     local t = object.tags
 
     local admin_level = get_admin_level(t)
-
-    if not valid_admin_level(admin_level) then
+    local disputed = valid_disputed(t)
+    -- If a relation does not an admin boundary or disputed boundary it has
+    -- nothing to tell us and we don't need the ways.
+    if not admin_level and not disputed then
         return
     end
 
     for _, member in ipairs(object.members) do
         if member.type == 'w' then
             if not rinfos[member.ref] then
-                rinfos[member.ref] = { admin_level = admin_level }
+                rinfos[member.ref] = { admin_level = admin_level, disputed = false }
             elseif rinfos[member.ref].admin_level > admin_level then
                 rinfos[member.ref].admin_level = admin_level
             end
-            rinfos[member.ref].disputed = (t.boundary == 'disputed')
+            rinfos[member.ref].disputed = disputed or rinfos[member.ref].disputed
         end
     end
 end)
