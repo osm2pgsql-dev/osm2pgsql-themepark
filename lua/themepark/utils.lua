@@ -38,8 +38,10 @@ function utils.write_to_file(filename, content)
 end
 
 function utils.build_select_query(columns, from, conditions, order_by, order_dir)
+    -- Handle from with schema prefix
+    local quoted_from = '"' .. string.gsub(from, '%.', '"."') .. '"'
     local sql = 'SELECT ' .. table.concat(columns, ',')
-                .. ' FROM "' .. from .. '"'
+                .. ' FROM ' .. quoted_from
 
     if conditions and #conditions > 0 then
         sql = sql .. ' WHERE ' .. table.concat(conditions, ' AND ')

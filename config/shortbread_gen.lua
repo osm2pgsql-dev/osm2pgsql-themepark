@@ -10,6 +10,7 @@
 -- If you are creating a tilekiln config you must also create
 -- the 'shortbread_config' directory.
 local TREX = false
+local BBOX = false
 local TILEKILN = false
 
 local themepark = require('themepark')
@@ -93,6 +94,37 @@ SELECT "name","name_de","name_en","kind","layer","ref","ref_rows","ref_cols","z_
 SELECT "name","name_de","name_en","kind","layer","ref","ref_rows","ref_cols","z_order","geom"
     FROM "streets_med"
     WHERE "geom" && !bbox! AND !zoom! >= "minzoom"
+    ORDER BY "z_order" asc]]
+                        },
+                    }
+                }
+            }
+        })
+    end
+    if BBOX then
+        themepark:plugin('bbox'):write_config('bbox-config.toml', {
+            tileset = 'osm',
+            extra_layers = {
+                {
+                    buffer_size = 10,
+                    name = 'street_labels',
+                    geometry_type = 'LINESTRING',
+                    query = {
+                        {
+                            minzoom = 14,
+                            sql = [[
+SELECT "name","name_de","name_en","kind","layer","ref","ref_rows","ref_cols","z_order","geom"
+    FROM "streets"
+    WHERE !zoom! >= "minzoom"
+    ORDER BY "z_order" asc]]
+                        },
+                        {
+                            minzoom = 11,
+                            maxzoom = 13,
+                            sql = [[
+SELECT "name","name_de","name_en","kind","layer","ref","ref_rows","ref_cols","z_order","geom"
+    FROM "streets_med"
+    WHERE !zoom! >= "minzoom"
     ORDER BY "z_order" asc]]
                         },
                     }

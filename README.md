@@ -30,7 +30,7 @@ how to create one yourself.
 The framework has support for plugins adding some functionality. They are in
 the `lua/themepark/plugins` directory.
 
-Available plugins are `taginfo`, `tilekiln`, and `t-rex`.
+Available plugins are `taginfo`, `tilekiln`, `t-rex` and `bbox`.
 
 ### Plugin `taginfo`
 
@@ -79,6 +79,27 @@ with options. Available options are:
   themepark config file.
 * `extra_layers`: Extra layers that should be added to the config file. Use
   the same structure as the T-Rex config file would use.
+
+### Plugin `bbox`
+
+This plugin can be used to create a config file for the
+[BBOX](https://www.bbox.earth/) tile server.
+
+Call like this from your config file to create a file called
+`bbox-config.toml`:
+
+```
+themepark:plugin('bbox'):write_config('bbox-config.toml')
+```
+
+A second argument on the `write_config()` function can contain a Lua table
+with options. Available options are:
+
+* `tileset`: Name of the tileset, defaults to `osm`.
+* `attribution`: Set attribution string, defaults to the setting from the
+  themepark config file.
+* `extra_layers`: Extra layers that should be added to the config file. Use
+  the same structure as the BBOX config file would use.
 
 ## Themes
 

@@ -10,6 +10,7 @@
 -- If you are creating a tilekiln config you must also create
 -- the 'shortbread_config' directory.
 local TREX = false
+local BBOX = false
 local TILEKILN = false
 local TAGINFO = false
 
@@ -68,6 +69,10 @@ themepark:add_topic('shortbread_v1/addresses')
 if osm2pgsql.mode == 'create' then
     if TREX then
         themepark:plugin('t-rex'):write_config('t-rex-config.toml', {})
+    end
+
+    if BBOX then
+        themepark:plugin('bbox'):write_config('bbox-config.toml', {})
     end
 
     if TILEKILN then
