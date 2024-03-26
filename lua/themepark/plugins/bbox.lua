@@ -30,8 +30,6 @@ local plugin = {}
 
 local utils = require 'themepark/utils'
 
-local plugin = {}
-
 local min_max_zoom_columns = function(columns)
     local column_names = {}
     local minzoom
@@ -141,8 +139,8 @@ local function build_layer_config(info)
                 minzoom, maxzoom, columns = min_max_zoom_columns(sublayer.columns)
 
                 local conditions = assemble_conditions(minzoom, maxzoom, sublayer.tiles.xycondition)
-                local from = schema_prefix .. group_table.name
-                local sql = utils.build_select_query(columns, from,
+                local subfrom = schema_prefix .. group_table.name
+                local sql = utils.build_select_query(columns, subfrom,
                                                      conditions, sublayer.tiles.order_by,
                                                      sublayer.tiles.order_dir)
                 table.insert(data.query, {
@@ -182,7 +180,7 @@ local function build_tileset_config(extra_layers)
     return layers
 end
 
-function ordered_keys(o)
+local function ordered_keys(o)
     local keys1 = {}
     local keys2 = {}
     for k, v in pairs(o) do
@@ -194,13 +192,13 @@ function ordered_keys(o)
     end
     table.sort(keys1)
     table.sort(keys2)
-    for _,v in ipairs(keys2) do 
+    for _,v in ipairs(keys2) do
         table.insert(keys1, v)
     end
     return keys1
 end
 
-function dump_toml(o, indent_size, parents)
+local function dump_toml(o, indent_size, parents)
     indent_size = indent_size or 2
     parents = parents or {}
     if type(o) == 'table' then
