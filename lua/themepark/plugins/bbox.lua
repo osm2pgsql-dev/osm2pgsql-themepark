@@ -75,7 +75,6 @@ local function build_layer_config(info)
         geometry_field = info.geom_column,
         geometry_type = string.upper(info.geom_type),
         srid = plugin.themepark.options.srid,
-        -- simplify = true,
         buffer_size = 10,
     }
 
@@ -192,7 +191,7 @@ local function ordered_keys(o)
     end
     table.sort(keys1)
     table.sort(keys2)
-    for _,v in ipairs(keys2) do
+    for _, v in ipairs(keys2) do
         table.insert(keys1, v)
     end
     return keys1
@@ -215,23 +214,23 @@ local function dump_toml(o, indent_size, parents)
                     table.remove(parents)
                 elseif type(k) == 'number' then
                     local tag = table.concat(parents, ".")
-                    s = s .. '\n\n' .. indent .. '[[' .. tag ..']]' .. dump_toml(v, indent_size, parents)
+                    s = s .. '\n\n' .. indent .. '[[' .. tag .. ']]' .. dump_toml(v, indent_size, parents)
                 else
                     table.insert(parents, k)
                     indent = string.rep(" ", #parents * indent_size)
                     local tag = table.concat(parents, ".")
-                    s = s .. '\n\n' .. indent .. '[' .. tag ..']' .. dump_toml(v, indent_size, parents)
+                    s = s .. '\n\n' .. indent .. '[' .. tag .. ']' .. dump_toml(v, indent_size, parents)
                     table.remove(parents)
                 end
             else
                 if type(v) == 'string' then
                     if string.find(v, '"') then
-                        v = '"""'..v..'"""'
+                        v = '"""' ..v.. '"""'
                     else
-                        v = '"'..v..'"'
+                        v = '"' ..v.. '"'
                     end
                 end
-                s = s .. '\n' .. indent .. k ..' = ' .. dump_toml(v, indent_size, parents)
+                s = s .. '\n' .. indent .. k .. ' = ' .. dump_toml(v, indent_size, parents)
             end
         end
         return s
@@ -248,12 +247,12 @@ function plugin:write_config(filename, options)
     end
 
     local config = {
-        webserver = { server_addr = '0.0.0.0:8080' },
+        webserver = { server_addr = '127.0.0.1:8080' },
         datasource = {
             {
                 name = 'db',
                 postgis = {
-                    url = "postgres:///db"
+                    url = "postgres:///db" -- overwrite with env vars
                 }
             }
         },
