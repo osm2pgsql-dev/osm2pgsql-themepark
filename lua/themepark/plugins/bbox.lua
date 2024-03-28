@@ -225,9 +225,9 @@ local function dump_toml(o, indent_size, parents)
             else
                 if type(v) == 'string' then
                     if string.find(v, '"') then
-                        v = '"""' ..v.. '"""'
+                        v = '"""' .. v .. '"""'
                     else
-                        v = '"' ..v.. '"'
+                        v = '"' .. v .. '"'
                     end
                 end
                 s = s .. '\n' .. indent .. k .. ' = ' .. dump_toml(v, indent_size, parents)
