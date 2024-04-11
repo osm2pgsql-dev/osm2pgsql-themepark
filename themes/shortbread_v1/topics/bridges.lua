@@ -34,7 +34,7 @@ themepark:add_proc('area', function(object, data)
             layer = data.core.layer
         }
 
-        for sgeom in object.as_area():geometries() do
+        for sgeom in object:as_area():geometries() do
             a.geom = sgeom
             themepark:insert('bridges', a, t)
         end

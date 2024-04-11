@@ -95,7 +95,7 @@ themepark:add_table{
 
 themepark:add_proc('area', function(object, data)
     local t = object.tags
-    local a = { geom = object.as_area() }
+    local a = { geom = object:as_area() }
 
     local minzoom = landuse_lookup[t.landuse]
     if minzoom then

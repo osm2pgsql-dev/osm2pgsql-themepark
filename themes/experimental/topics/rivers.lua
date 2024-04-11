@@ -36,7 +36,7 @@ themepark:add_proc('relation', function(object, data)
         kind = t.waterway
     }
 
-    a.geom = object.as_multilinestring()
+    a.geom = object:as_multilinestring()
     themepark.themes.core.add_name(a, object)
     themepark:insert('rivers', a, t)
 end)

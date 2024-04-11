@@ -24,7 +24,7 @@ themepark:add_table{
 themepark:add_proc('way', function(object)
     if object.is_closed and theme.has_area_tags(object.tags) then
         themepark:insert('polygons', {
-            geom = object.as_polygon(),
+            geom = object:as_polygon(),
             tags = object.tags
         })
     end
@@ -33,7 +33,7 @@ end)
 themepark:add_proc('relation', function(object)
     if themepark:relation_is_area(object) then
         themepark:insert('polygons', {
-            geom = object.as_multipolygon(),
+            geom = object:as_multipolygon(),
             tags = object.tags
         })
     end

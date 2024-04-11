@@ -115,7 +115,7 @@ local check_leisure = osm2pgsql.make_check_values_func({
 
 themepark:add_proc('area', function(object, data)
     local t = object.tags
-    local a = { geom = object.as_area() }
+    local a = { geom = object:as_area() }
 
     local minzoom = landuse_lookup[t.landuse]
     if minzoom then

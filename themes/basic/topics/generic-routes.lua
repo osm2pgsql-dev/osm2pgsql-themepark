@@ -24,7 +24,7 @@ themepark:add_table{
 themepark:add_proc('relation', function(object)
     if object.tags.type == 'route' then
         themepark:insert('routes', {
-            geom = object.as_multilinestring(),
+            geom = object:as_multilinestring(),
             tags = object.tags
         })
     end

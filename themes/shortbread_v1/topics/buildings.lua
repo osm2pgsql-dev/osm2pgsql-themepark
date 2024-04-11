@@ -28,7 +28,7 @@ themepark:add_proc('area', function(object, data)
     local t = object.tags
 
     if t.building and t.building ~= 'no' then
-        for sgeom in object.as_area():geometries() do
+        for sgeom in object:as_area():geometries() do
             local a = { geom = sgeom }
             themepark:insert('buildings', a, t)
         end

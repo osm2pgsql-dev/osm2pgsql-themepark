@@ -49,14 +49,14 @@ themepark:add_table{
 
 themepark:add_proc('node', function(object)
     themepark:insert('nodes', {
-        geom = object.as_point(),
+        geom = object:as_point(),
         tags = object.tags
     })
 end)
 
 themepark:add_proc('way', function(object)
     themepark:insert('ways', {
-        geom = object.as_linestring(),
+        geom = object:as_linestring(),
         tags = object.tags,
         nodes = '{' .. table.concat(object.nodes, ',') .. '}'
     })
@@ -64,7 +64,7 @@ end)
 
 themepark:add_proc('relation', function(object)
     themepark:insert('relations', {
-        geom = object.as_geometrycollection(),
+        geom = object:as_geometrycollection(),
         tags = object.tags,
         members = object.members
     })

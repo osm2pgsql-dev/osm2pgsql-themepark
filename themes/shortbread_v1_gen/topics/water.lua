@@ -173,7 +173,7 @@ themepark:add_proc('way', function(object, data)
     if check_waterway(waterway) then
         local a = {
             kind = waterway,
-            geom = object.as_linestring(),
+            geom = object:as_linestring(),
             layer = data.core.layer,
             width = parse_width(t.width),
             bridge = get_bridge_value(t.bridge),
@@ -221,7 +221,7 @@ themepark:add_proc('area', function(object, data)
         return
     end
 
-    local g = object.as_area():transform(3857)
+    local g = object:as_area():transform(3857)
     local a = {
         kind = kind,
         way_area = round(g:area()),

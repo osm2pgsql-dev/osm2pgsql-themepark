@@ -24,7 +24,7 @@ themepark:add_table{
 themepark:add_proc('relation', function(object)
     if object.tags.type == 'boundary' or (object.tags.type == 'multipolygon' and object.tags.boundary) then
         themepark:insert('boundaries', {
-            geom = object.as_multilinestring(),
+            geom = object:as_multilinestring(),
             tags = object.tags
         })
     end

@@ -51,7 +51,7 @@ themepark:add_proc('way', function(object, data)
 
     if man_made == 'pier' or man_made == 'breakwater' or man_made == 'groyne' then
         local a = { kind = man_made }
-        a.geom = object.as_linestring()
+        a.geom = object:as_linestring()
         themepark:insert('pier_lines', a, t)
     end
 end)
@@ -63,7 +63,7 @@ themepark:add_proc('area', function(object, data)
     if man_made == 'pier' or man_made == 'breakwater' or man_made == 'groyne' then
         local a = { kind = man_made }
 
-        for sgeom in object.as_area():geometries() do
+        for sgeom in object:as_area():geometries() do
             a.geom = sgeom
             themepark:insert('pier_polygons', a, t)
         end

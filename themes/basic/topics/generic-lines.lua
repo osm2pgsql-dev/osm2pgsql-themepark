@@ -24,7 +24,7 @@ themepark:add_table{
 themepark:add_proc('way', function(object)
     if not object.is_closed or not theme.has_area_tags(object.tags) then
         themepark:insert('lines', {
-            geom = object.as_linestring(),
+            geom = object:as_linestring(),
             tags = object.tags
         })
     end

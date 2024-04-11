@@ -56,7 +56,7 @@ themepark:add_proc('area', function(object, data)
         end
     end
 
-    a.geom = object.as_area()
+    a.geom = object:as_area()
     themepark.themes.core.add_name(a, object)
     themepark:add_debug_info(a, t)
     themepark:insert('sites', a)

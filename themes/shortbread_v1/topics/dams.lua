@@ -49,7 +49,7 @@ themepark:add_proc('way', function(object, data)
 
     if waterway == 'dam' then
         local a = { kind = waterway }
-        a.geom = object.as_linestring()
+        a.geom = object:as_linestring()
         themepark:insert('dam_lines', a, t)
     end
 end)
@@ -61,7 +61,7 @@ themepark:add_proc('area', function(object, data)
     if waterway == 'dam' then
         local a = { kind = waterway }
 
-        for sgeom in object.as_area():geometries() do
+        for sgeom in object:as_area():geometries() do
             a.geom = sgeom
             themepark:insert('dam_polygons', a, t)
         end

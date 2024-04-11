@@ -23,7 +23,7 @@ themepark:add_table{
 
 themepark:add_proc('node', function(object)
     themepark:insert('points', {
-        geom = object.as_point(),
+        geom = object:as_point(),
         tags = object.tags
     })
 end)
