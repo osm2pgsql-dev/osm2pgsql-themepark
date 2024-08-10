@@ -4,6 +4,8 @@
 --
 -- ---------------------------------------------------------------------------
 
+local themepark = ...
+
 local theme = {}
 
 local function init_polygon_lookup()

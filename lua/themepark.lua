@@ -157,7 +157,15 @@ function themepark:init_theme(theme)
         end
         local file = io.open(theme_file)
         if file then
-            themepark.themes[theme] = dofile(theme_file)
+            local script = file:read('a*')
+            file:close()
+
+            local func, msg = load(script, theme_file, 't')
+            if not func then
+                error('Loading ' .. theme_file .. ' failed: ' .. msg)
+            end
+
+            themepark.themes[theme] = func(self)
             themepark.themes[theme].dir = theme_dir
             break
         end
