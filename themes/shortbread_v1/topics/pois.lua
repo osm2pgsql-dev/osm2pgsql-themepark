@@ -66,9 +66,9 @@ get_value.leisure = osm2pgsql.make_check_values_func({
 })
 
 get_value.tourism = osm2pgsql.make_check_values_func({
-    'hotel', 'motel', 'bed_and_breakfast', 'guest_house', 'hostel', 'chalet',
-    'camp_site', 'alpine_hut', 'caravan_site', 'information', 'picnic_site',
-    'viewpoint', 'zoo', 'theme_park',
+    'hotel', 'motel', 'artwork', 'bed_and_breakfast', 'guest_house', 'hostel',
+    'chalet', 'camp_site', 'alpine_hut', 'caravan_site', 'information',
+    'picnic_site', 'viewpoint', 'zoo', 'theme_park',
 })
 
 get_value.shop = osm2pgsql.make_check_values_func({
@@ -87,7 +87,7 @@ get_value.man_made = osm2pgsql.make_check_values_func({
 })
 
 get_value.historic = osm2pgsql.make_check_values_func({
-    'monument', 'memorial', 'artwork', 'castle', 'ruins', 'archaelogical_site',
+    'monument', 'memorial', 'castle', 'ruins', 'archaelogical_site',
     'wayside_cross', 'wayside_shrine', 'battlefield', 'fort',
 })
 
