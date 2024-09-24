@@ -201,14 +201,17 @@ WITH simplified AS (
     SELECT way_ids, relation_ids, admin_level, maritime, disputed, ST_SimplifyVW(geom, ]] .. c.simplify .. [[) AS geom
         FROM {schema}.{prefix}boundaries ]] .. c.condition .. [[
 )
-INSERT INTO {schema}.{prefix}boundaries_]] .. level .. [[_new (way_ids, relation_ids, admin_level, maritime, disputed, geom)
+INSERT INTO {schema}.{prefix}boundaries_]] .. level ..
+    [[_new (way_ids, relation_ids, admin_level, maritime, disputed, geom)
     SELECT way_ids, relation_ids, admin_level, maritime, disputed, geom
     FROM simplified WHERE ST_Length(geom) > ]] .. c.minlength)
 
     table.insert(sql, 'ANALYZE {schema}.{prefix}boundaries_' .. level .. '_new')
-    table.insert(sql, 'CREATE INDEX ON {schema}.{prefix}boundaries_' .. level .. '_new USING GIST (geom)')
+    table.insert(sql, 'CREATE INDEX ON {schema}.{prefix}boundaries_' .. level ..
+                      '_new USING GIST (geom)')
     table.insert(sql, 'DROP TABLE {schema}.{prefix}boundaries_' .. level)
-    table.insert(sql, 'ALTER TABLE {schema}.{prefix}boundaries_' .. level .. '_new RENAME TO {prefix}boundaries_' .. level)
+    table.insert(sql, 'ALTER TABLE {schema}.{prefix}boundaries_' .. level ..
+                      '_new RENAME TO {prefix}boundaries_' .. level)
 end
 
 themepark:add_proc('gen', function(data)
