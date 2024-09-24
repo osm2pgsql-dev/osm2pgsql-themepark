@@ -439,10 +439,15 @@ end
 
 -- ---------------------------------------------------------------------------
 
-function themepark.expand_template(command)
-    local res = string.gsub(command, '{schema}', themepark.options.schema)
+function themepark.expand_template(str)
+    str = string.gsub(str, '{schema}', themepark.options.schema)
+    str = string.gsub(str, '{prefix}', themepark.options.prefix or '')
     -- ignore second return value of gsub
-    return res
+    return str
+end
+
+function themepark.with_prefix(name)
+    return (themepark.options.prefix or '') .. name
 end
 
 -- ---------------------------------------------------------------------------

@@ -441,8 +441,8 @@ themepark:add_proc('gen', function(data)
         transaction = true,
         sql = {
             themepark.expand_template([[
-CREATE TABLE {schema}.streets_med_new
-    (LIKE {schema}.streets_med INCLUDING IDENTITY)]]),
+CREATE TABLE {schema}.{prefix}streets_med_new
+    (LIKE {schema}.{prefix}streets_med INCLUDING IDENTITY)]]),
             themepark.expand_template([[
 CREATE OR REPLACE FUNCTION osm2pgsql_shortbread_streets_med() RETURNS void AS $$
 DECLARE
@@ -450,14 +450,14 @@ DECLARE
 BEGIN
   FOR cell IN
     SELECT ST_TileEnvelope(6, x, y) FROM generate_series(0, 63) x, generate_series(0, 63) y
-        WHERE ST_TileEnvelope(6, x, y) && ST_EstimatedExtent('{schema}', 'streets_med_interim', 'geom')
+        WHERE ST_TileEnvelope(6, x, y) && ST_EstimatedExtent('{schema}', '{prefix}streets_med_interim', 'geom')
   LOOP
     WITH
     merged AS
         (SELECT kind, link, rail, tunnel, bridge, tracktype, surface,
                 service, layer, ref, ref_rows, ref_cols, z_order, minzoom,
                 ST_LineMerge(ST_Collect(geom)) AS geom
-        FROM {schema}.streets_med_interim
+        FROM {schema}.{prefix}streets_med_interim
             WHERE geom && cell
             GROUP BY kind, link, rail, tunnel, bridge, tracktype, surface,
                     service, layer, ref, ref_rows, ref_cols, z_order, minzoom),
@@ -467,7 +467,7 @@ BEGIN
             ref_rows, ref_cols, z_order, minzoom,
             ST_Simplify((ST_Dump(geom)).geom, 20) AS geom
         FROM merged)
-    INSERT INTO {schema}.streets_med_new (way_id, kind, link, rail, tunnel, bridge,
+    INSERT INTO {schema}.{prefix}streets_med_new (way_id, kind, link, rail, tunnel, bridge,
                             tracktype, surface, service, layer, ref,
                             ref_rows, ref_cols, z_order, minzoom, geom)
         SELECT * FROM simplified WHERE geom IS NOT NULL;
@@ -476,10 +476,10 @@ END;
 $$ LANGUAGE plpgsql]]),
             themepark.expand_template('SELECT osm2pgsql_shortbread_streets_med()'),
             themepark.expand_template('DROP FUNCTION osm2pgsql_shortbread_streets_med()'),
-            themepark.expand_template('ANALYZE {schema}.streets_med_new'),
-            themepark.expand_template('CREATE INDEX ON {schema}.streets_med_new USING GIST (geom)'),
-            themepark.expand_template('DROP TABLE {schema}.streets_med'),
-            themepark.expand_template('ALTER TABLE {schema}.streets_med_new RENAME TO streets_med'),
+            themepark.expand_template('ANALYZE {schema}.{prefix}streets_med_new'),
+            themepark.expand_template('CREATE INDEX ON {schema}.{prefix}streets_med_new USING GIST (geom)'),
+            themepark.expand_template('DROP TABLE {schema}.{prefix}streets_med'),
+            themepark.expand_template('ALTER TABLE {schema}.{prefix}streets_med_new RENAME TO streets_med'),
         }
     })
 
@@ -488,22 +488,22 @@ $$ LANGUAGE plpgsql]]),
         transaction = true,
         sql = {
             themepark.expand_template([[
-CREATE TABLE {schema}.streets_low_new
-(LIKE {schema}.streets_low INCLUDING IDENTITY)]]),
+CREATE TABLE {schema}.{prefix}streets_low_new
+(LIKE {schema}.{prefix}streets_low INCLUDING IDENTITY)]]),
             themepark.expand_template([[
 WITH
 merged AS
     (SELECT kind, ref, rail, minzoom, ST_LineMerge(ST_Collect(geom)) AS geom
-        FROM {schema}.streets_low_interim GROUP BY kind, ref, rail, minzoom),
+        FROM {schema}.{prefix}streets_low_interim GROUP BY kind, ref, rail, minzoom),
 simplified AS
     (SELECT 1, kind, ref, rail, minzoom,
             ST_Simplify((ST_Dump(geom)).geom, 20) AS geom FROM merged)
-INSERT INTO {schema}.streets_low_new (way_id, kind, ref, rail, minzoom, geom)
+INSERT INTO {schema}.{prefix}streets_low_new (way_id, kind, ref, rail, minzoom, geom)
     SELECT * FROM simplified WHERE geom IS NOT NULL]]),
-            themepark.expand_template('ANALYZE {schema}.streets_low_new'),
-            themepark.expand_template('CREATE INDEX ON {schema}.streets_low_new USING GIST (geom)'),
-            themepark.expand_template('DROP TABLE {schema}.streets_low'),
-            themepark.expand_template('ALTER TABLE {schema}.streets_low_new RENAME TO streets_low'),
+            themepark.expand_template('ANALYZE {schema}.{prefix}streets_low_new'),
+            themepark.expand_template('CREATE INDEX ON {schema}.{prefix}streets_low_new USING GIST (geom)'),
+            themepark.expand_template('DROP TABLE {schema}.{prefix}streets_low'),
+            themepark.expand_template('ALTER TABLE {schema}.{prefix}streets_low_new RENAME TO streets_low'),
         }
     })
 end)

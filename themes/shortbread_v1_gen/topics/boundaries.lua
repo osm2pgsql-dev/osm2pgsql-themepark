@@ -22,7 +22,7 @@ local gen_config = {
 -- It used zoom level 0, so there will always be at most one entry which
 -- triggers re-calculation of all boundaries in the world.
 local expire_boundaries = osm2pgsql.define_expire_output({
-    table = 'expire_boundaries'
+    table = themepark.with_prefix('expire_boundaries')
 })
 
 -- This table contains all the ways that are members of a boundary relation.
@@ -193,27 +193,27 @@ end)
 local function gen_commands(sql, level)
     local c = gen_config[level]
 
-    table.insert(sql, 'CREATE TABLE {schema}.boundaries_' .. level ..
-                      '_new (LIKE {schema}.boundaries_' .. level .. ' INCLUDING IDENTITY)')
+    table.insert(sql, 'CREATE TABLE {schema}.{prefix}boundaries_' .. level ..
+                      '_new (LIKE {schema}.{prefix}boundaries_' .. level .. ' INCLUDING IDENTITY)')
 
     table.insert(sql, [[
 WITH simplified AS (
     SELECT way_ids, relation_ids, admin_level, maritime, disputed, ST_SimplifyVW(geom, ]] .. c.simplify .. [[) AS geom
-        FROM {schema}.boundaries ]] .. c.condition .. [[
+        FROM {schema}.{prefix}boundaries ]] .. c.condition .. [[
 )
-INSERT INTO {schema}.boundaries_]] .. level .. [[_new (way_ids, relation_ids, admin_level, maritime, disputed, geom)
+INSERT INTO {schema}.{prefix}boundaries_]] .. level .. [[_new (way_ids, relation_ids, admin_level, maritime, disputed, geom)
     SELECT way_ids, relation_ids, admin_level, maritime, disputed, geom
     FROM simplified WHERE ST_Length(geom) > ]] .. c.minlength)
 
-    table.insert(sql, 'ANALYZE {schema}.boundaries_' .. level .. '_new')
-    table.insert(sql, 'CREATE INDEX ON {schema}.boundaries_' .. level .. '_new USING GIST (geom)')
-    table.insert(sql, 'DROP TABLE {schema}.boundaries_' .. level)
-    table.insert(sql, 'ALTER TABLE {schema}.boundaries_' .. level .. '_new RENAME TO boundaries_' .. level)
+    table.insert(sql, 'ANALYZE {schema}.{prefix}boundaries_' .. level .. '_new')
+    table.insert(sql, 'CREATE INDEX ON {schema}.{prefix}boundaries_' .. level .. '_new USING GIST (geom)')
+    table.insert(sql, 'DROP TABLE {schema}.{prefix}boundaries_' .. level)
+    table.insert(sql, 'ALTER TABLE {schema}.{prefix}boundaries_' .. level .. '_new RENAME TO {prefix}boundaries_' .. level)
 end
 
 themepark:add_proc('gen', function(data)
     local sql = {
-        'CREATE TABLE {schema}.boundaries_new (LIKE {schema}.boundaries INCLUDING IDENTITY)',
+        'CREATE TABLE {schema}.{prefix}boundaries_new (LIKE {schema}.{prefix}boundaries INCLUDING IDENTITY)',
         [[
 WITH multigeom AS (
 SELECT array_agg(way_id ORDER BY way_id) AS way_ids,
@@ -222,24 +222,24 @@ SELECT array_agg(way_id ORDER BY way_id) AS way_ids,
     (maritime OR coastline) AS maritime,
     disputed,
     ST_LineMerge(ST_Collect(geom)) AS geom
-    FROM {schema}.boundaries_ways_interim
+    FROM {schema}.{prefix}boundaries_ways_interim
         WHERE closure_segment IS FALSE
         GROUP BY relation_ids, maritime OR coastline, disputed
 )
-INSERT INTO {schema}.boundaries_new (way_ids, relation_ids, admin_level, maritime, disputed, geom)
+INSERT INTO {schema}.{prefix}boundaries_new (way_ids, relation_ids, admin_level, maritime, disputed, geom)
 SELECT way_ids, relation_ids, admin_level, maritime, disputed, (ST_Dump(geom)).geom AS geom
     FROM multigeom ]],
-        'ANALYZE {schema}.boundaries_new',
-        'CREATE INDEX ON {schema}.boundaries_new USING GIST (geom)',
-        'DROP TABLE {schema}.boundaries',
-        'ALTER TABLE {schema}.boundaries_new RENAME TO boundaries'
+        'ANALYZE {schema}.{prefix}boundaries_new',
+        'CREATE INDEX ON {schema}.{prefix}boundaries_new USING GIST (geom)',
+        'DROP TABLE {schema}.{prefix}boundaries',
+        'ALTER TABLE {schema}.{prefix}boundaries_new RENAME TO {prefix}boundaries'
     }
 
     gen_commands(sql, 'l');
     gen_commands(sql, 'm');
     gen_commands(sql, 's');
 
-    table.insert(sql, 'TRUNCATE {schema}.expire_boundaries')
+    table.insert(sql, 'TRUNCATE {schema}.{prefix}expire_boundaries')
 
     local expanded_sql = {}
     for _, s in ipairs(sql) do
@@ -248,7 +248,7 @@ SELECT way_ids, relation_ids, admin_level, maritime, disputed, (ST_Dump(geom)).g
 
     osm2pgsql.run_sql({
         description = 'Merge boundary lines for small zoom levels',
-        if_has_rows = themepark.expand_template('SELECT 1 FROM {schema}.expire_boundaries LIMIT 1'),
+        if_has_rows = themepark.expand_template('SELECT 1 FROM {schema}.{prefix}expire_boundaries LIMIT 1'),
         transaction = true,
         sql = expanded_sql
     })

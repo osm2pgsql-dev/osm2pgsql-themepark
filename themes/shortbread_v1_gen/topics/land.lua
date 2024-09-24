@@ -17,7 +17,7 @@ local expire_outputs = {}
 for _, zoom in ipairs(gen_zoom_levels) do
     expire_outputs[zoom] = osm2pgsql.define_expire_output({
         maxzoom = zoom,
-        table = 'expire_land_z' .. zoom
+        table = themepark.with_prefix('expire_land_z' .. zoom)
     })
 
     themepark:add_table{
@@ -171,8 +171,8 @@ themepark:add_proc('gen', function(data)
             schema = themepark.options.schema,
             name = 'land_z' .. zoom,
             debug = false,
-            src_table = 'land',
-            dest_table = 'land_z' .. zoom,
+            src_table = themepark.with_prefix('land'),
+            dest_table = themepark.with_prefix('land_z' .. zoom),
             zoom = zoom,
             geom_column = 'geom',
             group_by_column = 'kind',

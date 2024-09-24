@@ -23,7 +23,7 @@ local expire_levels = {}
 for _, level in ipairs(gen_levels) do
     expire_levels[level] = osm2pgsql.define_expire_output({
         maxzoom = gen_config[level].genzoom,
-        table = 'expire_water_polygons_' .. level
+        table = themepark.with_prefix('expire_water_polygons_' .. level)
     })
 
     themepark:add_table{
@@ -94,7 +94,7 @@ themepark:add_table{
 }
 
 local expire_lines = osm2pgsql.define_expire_output({
-    table = 'expire_water_lines'
+    table = themepark.with_prefix('expire_water_lines')
 })
 
 -- Used as basis for generalized data
@@ -252,8 +252,8 @@ themepark:add_proc('gen', function(data)
             schema = themepark.options.schema,
             name = 'water_polygons_' .. level,
             debug = false,
-            src_table = 'water_polygons',
-            dest_table = 'water_polygons_' .. level,
+            src_table = themepark.with_prefix('water_polygons'),
+            dest_table = themepark.with_prefix('water_polygons_' .. level),
             zoom = gen_config[level].genzoom,
             geom_column = 'geom',
             group_by_column = 'kind',
@@ -265,28 +265,28 @@ themepark:add_proc('gen', function(data)
 
     osm2pgsql.run_sql({
         description = 'Merge water lines for small zoom levels',
-        if_has_rows = themepark.expand_template('SELECT 1 FROM {schema}.expire_water_lines LIMIT 1'),
+        if_has_rows = themepark.expand_template('SELECT 1 FROM {schema}.{prefix}expire_water_lines LIMIT 1'),
         transaction = true,
         sql = {
             themepark.expand_template([[
-CREATE TABLE {schema}.water_lines_gen_new
-(LIKE {schema}.water_lines_gen INCLUDING IDENTITY)]]),
+CREATE TABLE {schema}.{prefix}water_lines_gen_new
+(LIKE {schema}.{prefix}water_lines_gen INCLUDING IDENTITY)]]),
             themepark.expand_template([[
 WITH merged AS
     (SELECT ]] .. name_list .. [[, kind, tunnel, bridge, ST_LineMerge(ST_Collect(geom)) AS geom
-        FROM {schema}.water_lines_gen_interim
+        FROM {schema}.{prefix}water_lines_gen_interim
             GROUP BY kind, ]] .. name_list .. [[, tunnel, bridge),
 simplified AS
     (SELECT ]] .. name_list .. [[, kind, tunnel, bridge,
             ST_Simplify((ST_Dump(geom)).geom, 20) AS geom FROM merged)
-INSERT INTO {schema}.water_lines_gen_new (]] .. name_list .. [[, kind, tunnel, bridge, geom)
+INSERT INTO {schema}.{prefix}water_lines_gen_new (]] .. name_list .. [[, kind, tunnel, bridge, geom)
     SELECT * FROM simplified WHERE geom IS NOT NULL
 ]]),
-            themepark.expand_template('ANALYZE {schema}.water_lines_gen_new'),
-            themepark.expand_template('CREATE INDEX ON {schema}.water_lines_gen_new USING GIST (geom)'),
-            themepark.expand_template('DROP TABLE {schema}.water_lines_gen'),
-            themepark.expand_template('ALTER TABLE {schema}.water_lines_gen_new RENAME TO water_lines_gen'),
-            themepark.expand_template('TRUNCATE {schema}.expire_water_lines'),
+            themepark.expand_template('ANALYZE {schema}.{prefix}water_lines_gen_new'),
+            themepark.expand_template('CREATE INDEX ON {schema}.{prefix}water_lines_gen_new USING GIST (geom)'),
+            themepark.expand_template('DROP TABLE {schema}.{prefix}water_lines_gen'),
+            themepark.expand_template('ALTER TABLE {schema}.{prefix}water_lines_gen_new RENAME TO water_lines_gen'),
+            themepark.expand_template('TRUNCATE {schema}.{prefix}expire_water_lines'),
         }
     })
 end)
