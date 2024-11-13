@@ -160,6 +160,18 @@ command provided with newer osm2pgsql versions.
 
 [More...](themes/shortbread_v1_gen/README.md)
 
+## Testing
+
+Some unit tests are provided in the `tests` directory. You'll nee the ["busted"
+testing framework](https://lunarmodules.github.io/busted/) installed (`luarocks
+install busted` or install the `lua-busted` apt package on Debian).
+
+Run all tests:
+
+```
+bin/run-tests.sh
+```
+
 ## License
 
 Copyright 2024 Jochen Topf <jochen@topf.org>

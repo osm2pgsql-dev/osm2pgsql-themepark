@@ -30,5 +30,5 @@ stds.osm2pgsql = {
     }
 }
 
-std = 'min+osm2pgsql'
+std = 'min+osm2pgsql+busted'
 
