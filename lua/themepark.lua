@@ -129,9 +129,16 @@ end
 -- ---------------------------------------------------------------------------
 -- init_theme(THEME)
 --
--- Initialize THEME. Uses the theme search path.
+-- Initialize THEME. Uses the theme search path. Returns the theme.
+--
+-- If the theme has already been initialized by an earlier call to this
+-- function, the existing theme is returned.
 -- ---------------------------------------------------------------------------
 function themepark:init_theme(theme)
+    if themepark.themes[theme] then
+        return themepark.themes[theme]
+    end
+
     if theme == '' then
         local dir = script_path(2)
         themepark.themes[''] = { dir = dir }
@@ -178,31 +185,31 @@ function themepark:init_theme(theme)
     if themepark.debug then
         print("Themepark: Loading theme '" .. theme .. "' done.")
     end
+
+    return themepark.themes[theme]
 end
 
 -- ---------------------------------------------------------------------------
 -- ---------------------------------------------------------------------------
 function themepark:add_topic(topic, cfg)
-    local theme = ''
+    local theme_name = ''
     local slash = string.find(topic, '/')
     if slash then
-        theme = string.sub(topic, 1, slash - 1)
+        theme_name = string.sub(topic, 1, slash - 1)
         topic = string.sub(topic, slash + 1)
     end
 
-    if not themepark.themes[theme] then
-        themepark:init_theme(theme)
-    end
+    local theme = themepark:init_theme(theme_name)
 
     if themepark.debug then
-        print("Themepark: Adding topic '" .. topic .. "' from theme '" .. theme .. "' ...")
+        print("Themepark: Adding topic '" .. topic .. "' from theme '" .. theme_name .. "' ...")
     end
 
-    local filename = themepark.themes[theme].dir .. '/topics/' .. topic .. '.lua'
+    local filename = theme.dir .. '/topics/' .. topic .. '.lua'
 
     local file, errmsg = io.open(filename, 'r')
     if not file then
-        error("No topic '" .. topic .. "' in theme '" .. theme .. "'")
+        error("No topic '" .. topic .. "' in theme '" .. theme_name .. "'")
     end
 
     local script = file:read('a*')
@@ -213,10 +220,10 @@ function themepark:add_topic(topic, cfg)
         error('Load failed: ' .. msg)
     end
 
-    local result = func(self, self.themes[theme], cfg or {})
+    local result = func(self, theme, cfg or {})
 
     if themepark.debug then
-        print("Themepark: Adding topic '" .. topic .. "' from theme '" .. theme .. "' done.")
+        print("Themepark: Adding topic '" .. topic .. "' from theme '" .. theme_name .. "' done.")
     end
 
     return result
