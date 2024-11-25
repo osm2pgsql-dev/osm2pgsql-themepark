@@ -8,7 +8,8 @@
 
 local themepark = require('themepark')
 
-themepark.debug = false
+-- For debug mode set this or the environment variable THEMEPARK_DEBUG.
+--themepark.debug = true
 
 -- ---------------------------------------------------------------------------
 

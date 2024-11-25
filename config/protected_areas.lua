@@ -8,7 +8,8 @@
 
 local themepark = require('themepark')
 
-themepark.debug = true
+-- For debug mode set this or the environment variable THEMEPARK_DEBUG.
+--themepark.debug = true
 
 themepark:set_option('srid', 4326)
 themepark:set_option('tags', 'all_tags')

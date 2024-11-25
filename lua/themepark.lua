@@ -62,6 +62,10 @@ local themepark = {
     },
 }
 
+if os.getenv('THEMEPARK_DEBUG') then
+    themepark.debug = true
+end
+
 themepark.theme_path = { script_path(3) .. '../themes/', themepark.dir .. 'themes/' }
 
 -- ---------------------------------------------------------------------------
