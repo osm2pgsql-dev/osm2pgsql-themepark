@@ -190,13 +190,22 @@ function themepark:init_theme(theme)
 end
 
 -- ---------------------------------------------------------------------------
+-- add_topic(TOPIC, OPTIONS)
+--
+-- Add TOPIC. TOPIC consists of the THEME, a forward slash (/), and the topic
+-- in that theme. Will initialize the theme if that hasn't been done already.
+--
+-- OPTIONS is an optional key/value table with config options forwarded to the
+-- topic.
 -- ---------------------------------------------------------------------------
-function themepark:add_topic(topic, cfg)
+function themepark:add_topic(topic, options)
     local theme_name = ''
     local slash = string.find(topic, '/')
     if slash then
         theme_name = string.sub(topic, 1, slash - 1)
         topic = string.sub(topic, slash + 1)
+    else
+        error("Missing '/' in topic: " .. topic)
     end
 
     local theme = self:init_theme(theme_name)
@@ -220,7 +229,7 @@ function themepark:add_topic(topic, cfg)
         error('Load failed: ' .. msg)
     end
 
-    local result = func(self, theme, cfg or {})
+    local result = func(self, theme, options or {})
 
     if self.debug then
         print("Themepark: Adding topic '" .. topic .. "' from theme '" .. theme_name .. "' done.")
