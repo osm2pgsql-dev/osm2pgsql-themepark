@@ -165,7 +165,6 @@ local get_attributes = function(object)
     a.housenumber = t['addr:housenumber']
 
     themepark.themes.core.add_name(a, object)
-    themepark:add_debug_info(a, t)
 
     return a
 end
@@ -173,19 +172,19 @@ end
 -- ---------------------------------------------------------------------------
 
 themepark:add_proc('node', function(object, data)
-    local a = get_attributes(object)
+    local a, t = get_attributes(object)
     if a then
         a.geom = object:as_point()
-        themepark:insert('pois', a)
+        themepark:insert('pois', a, object.tags)
         data.shortbread_in_pois = true
     end
 end)
 
 themepark:add_proc('area', function(object, data)
-    local a = get_attributes(object)
+    local a, t = get_attributes(object)
     if a then
         a.geom = object:as_area():centroid()
-        themepark:insert('pois', a)
+        themepark:insert('pois', a, object.tags)
         data.shortbread_in_pois = true
     end
 end)

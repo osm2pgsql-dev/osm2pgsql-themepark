@@ -124,8 +124,7 @@ themepark:add_proc('way', function(object, data)
             a.minzoom = 9
         end
 
-        themepark:add_debug_info(a, t)
-        themepark:insert('water_lines', a)
+        themepark:insert('water_lines', a, t)
 
         if themepark.themes.core.add_name(a, object) then
             themepark:insert('water_lines_labels', a)
