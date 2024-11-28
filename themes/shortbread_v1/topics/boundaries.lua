@@ -11,7 +11,7 @@ themepark:add_table{
     name = 'boundaries',
     ids_type = 'way',
     geom = 'linestring',
-    columns = themepark:columns('core/name', {
+    columns = themepark:columns({
         { column = 'admin_level', type = 'int' },
         { column = 'maritime', type = 'bool' },
         { column = 'disputed', type = 'bool' },
@@ -71,7 +71,7 @@ themepark:add_proc('way', function(object, data)
         disputed = info.disputed or (t.disputed and t.disputed == 'yes'),
         geom = object:as_linestring()
     }
-    themepark.themes.core.add_name(a, object)
+
     themepark:insert('boundaries', a, t)
 end)
 
