@@ -26,13 +26,17 @@
 --
 -- ---------------------------------------------------------------------------
 
-local function script_path_impl(num)
-    local str = debug.getinfo(num, "S").source:sub(2)
-    return str:match("(.*/)")
+local function script_dir_impl(num)
+    local src = debug.getinfo(num, "S").source
+    return src:match("^@(.*/)") -- return directory
 end
 
-local function script_path(num)
-    local success, value = pcall(script_path_impl, num)
+-- Return the directory of the script calling this function directly or
+-- indirectly. Goes 'num' levels up the call stack, and returns the directory
+-- of the script running the function found in that way. Returns the current
+-- directory ('./') if that fails.
+local function script_dir(num)
+    local success, value = pcall(script_dir_impl, num)
     if success and value then
         return value
     end
@@ -40,7 +44,8 @@ local function script_path(num)
 end
 
 local themepark = {
-    dir = script_path(2),
+    dir = script_dir(1),
+    theme_search_path = {},
     debug = false,
     options = {
         schema = 'public',
@@ -66,7 +71,24 @@ if os.getenv('THEMEPARK_DEBUG') then
     themepark.debug = true
 end
 
-themepark.theme_path = { script_path(3) .. '../themes/', themepark.dir .. 'themes/' }
+(function()
+    -- Use search path from THEMEPARK_PATH env variable if available
+    local search_path_from_env = os.getenv('THEMEPARK_PATH')
+    if search_path_from_env then
+        themepark.theme_search_path = osm2pgsql.split_string(search_path_from_env, ':')
+    end
+
+    -- Theme search path always contains:
+    -- * 'themes' directory in the themepark repo
+    -- * current directory
+    local themes_dir = themepark.dir:gsub('/lua/$', '/themes')
+    table.insert(themepark.theme_search_path, themes_dir)
+    table.insert(themepark.theme_search_path, '.')
+
+    if themepark.debug then
+        print("Themepark: Theme search path: " .. table.concat(themepark.theme_search_path, ':'))
+    end
+end)()
 
 -- ---------------------------------------------------------------------------
 -- set_option(NAME, VALUE)
@@ -117,17 +139,19 @@ end
 -- ---------------------------------------------------------------------------
 -- add_theme_dir(DIR)
 --
--- Append DIR to search path for themes. If DIR is a relative path,
+-- Prepend DIR to search path for themes. If DIR is a relative path,
 -- interpret it relative to the file the function was called from.
 -- ---------------------------------------------------------------------------
 function themepark:add_theme_dir(dir)
     if string.find(dir, '/') ~= 1 then
-        dir = script_path(5) .. dir .. '/'
+        dir = script_dir(5) .. dir
     end
+    table.insert(self.theme_search_path, 1, dir)
+
     if self.debug then
-        print("Themepark: Add theme directory at '" .. dir .. "'.")
+        print("Themepark: Added theme directory at '" .. dir .. "'.")
+        print("Themepark: Theme search path: " .. table.concat(themepark.theme_search_path, ':'))
     end
-    table.insert(self.theme_path, dir .. '/')
 end
 
 -- ---------------------------------------------------------------------------
@@ -144,7 +168,7 @@ function themepark:init_theme(theme)
     end
 
     if theme == '' then
-        local dir = script_path(2)
+        local dir = script_dir(2)
         self.themes[''] = { dir = dir }
         if self.debug then
             print("Themepark: Loading theme '' with path '" .. dir .. "' ...")
@@ -160,8 +184,8 @@ function themepark:init_theme(theme)
         print("Themepark: Loading theme '" .. theme .. "' ...")
     end
 
-    for _, dir in ipairs(self.theme_path) do
-        local theme_dir = dir .. theme
+    for _, dir in ipairs(self.theme_search_path) do
+        local theme_dir = dir .. '/' .. theme
         local theme_file = theme_dir .. '/init.lua'
         if self.debug then
             print("Themepark:   Trying to load from '" .. theme_file .. "' ...")
