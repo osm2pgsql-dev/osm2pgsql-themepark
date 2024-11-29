@@ -130,6 +130,19 @@ function themepark:add_theme_dir(dir)
     table.insert(self.theme_path, dir .. '/')
 end
 
+function themepark:_read_and_exec(file, name)
+    local script = file:read('a*')
+    file:close()
+
+    local func, msg = load(script, name, 't')
+    if not func then
+        msg = msg:gsub('.*]:', '')
+        error(name .. ':' .. msg, 0)
+    end
+
+    return func(self)
+end
+
 -- ---------------------------------------------------------------------------
 -- init_theme(THEME)
 --
@@ -162,22 +175,25 @@ function themepark:init_theme(theme)
 
     for _, dir in ipairs(self.theme_path) do
         local theme_dir = dir .. theme
-        local theme_file = theme_dir .. '/init.lua'
+        local init_file_name = theme_dir .. '/init.lua'
         if self.debug then
-            print("Themepark:   Trying to load from '" .. theme_file .. "' ...")
+            print("Themepark:   Trying to load from '" .. init_file_name .. "' ...")
         end
-        local file = io.open(theme_file)
-        if file then
-            local script = file:read('a*')
-            file:close()
+        local init_file = io.open(init_file_name)
+        if init_file then
+            self.themes[theme] = self:_read_and_exec(init_file, init_file_name)
+            self.themes[theme].dir = theme_dir
 
-            local func, msg = load(script, theme_file, 't')
-            if not func then
-                error('Loading ' .. theme_file .. ' failed: ' .. msg)
+            local helper_file_name = theme_dir .. '/helper.lua'
+            if self.debug then
+                print("Themepark:   Trying to load from '" .. helper_file_name .. "' ...")
             end
 
-            self.themes[theme] = func(self)
-            self.themes[theme].dir = theme_dir
+            local helper_file = io.open(helper_file_name)
+            if helper_file then
+                self.themes[theme].helper = self:_read_and_exec(helper_file, helper_file_name)
+            end
+
             break
         end
     end

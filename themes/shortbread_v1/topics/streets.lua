@@ -223,10 +223,6 @@ local aeroway_lookup = {
     taxiway = 13,
 }
 
-local as_bool = function(value)
-    return value == 'yes' or value == 'true' or value == '1'
-end
-
 local set_ref_attributes = function(a, t)
     if not t.ref then
         return
@@ -285,8 +281,8 @@ local process_as_area = function(object, data)
 
     a.surface = t.surface
 
-    a.tunnel = as_bool(t.tunnel) or t.tunnel == 'building_passage' or t.covered == 'yes'
-    a.bridge = as_bool(t.bridge)
+    a.tunnel = theme.helper.is_yes_true_or_one(t.tunnel) or t.tunnel == 'building_passage' or t.covered == 'yes'
+    a.bridge = theme.helper.is_yes_true_or_one(t.bridge)
 
     a.geom = object:as_polygon():transform(3857)
     local has_name = themepark.themes.core.add_name(a, object)
@@ -372,8 +368,8 @@ themepark:add_proc('way', function(object, data)
         return
     end
 
-    a.tunnel = as_bool(t.tunnel) or t.tunnel == 'building_passage' or t.covered == 'yes'
-    a.bridge = as_bool(t.bridge)
+    a.tunnel = theme.helper.is_yes_true_or_one(t.tunnel) or t.tunnel == 'building_passage' or t.covered == 'yes'
+    a.bridge = theme.helper.is_yes_true_or_one(t.bridge)
 
     set_ref_attributes(a, t)
 
