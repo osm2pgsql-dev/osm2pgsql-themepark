@@ -44,18 +44,15 @@ local function script_dir(num)
 end
 
 local themepark = {
-    dir = script_dir(1),
-    theme_search_path = {},
+    _columns = {},
     debug = false,
+    dir = script_dir(1),
+    layers = {},
     options = {
         schema = 'public',
         srid = 3857,
         attribution = '© OpenStreetMap contributors - https://openstreetmap.org/copyright',
     },
-    layers = {},
-    tables = {},
-    themes = {},
-    _columns = {},
     process = {
         node = {},
         way = {},
@@ -64,6 +61,9 @@ local themepark = {
         select_relation_members = {},
         gen = {}
     },
+    tables = {},
+    theme_search_path = {},
+    themes = {},
 }
 
 if os.getenv('THEMEPARK_DEBUG') then
