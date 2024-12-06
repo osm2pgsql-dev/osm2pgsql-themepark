@@ -56,7 +56,6 @@ local themepark = {
     tables = {},
     themes = {},
     _columns = {},
-    pre = function() return true end,
     process = {
         node = {},
         way = {},
@@ -163,15 +162,6 @@ end
 function themepark:init_theme(theme)
     if self.themes[theme] then
         return self.themes[theme]
-    end
-
-    if theme == '' then
-        local dir = script_dir(2)
-        self.themes[''] = { dir = dir }
-        if self.debug then
-            print("Themepark: Loading theme '' with path '" .. dir .. "' ...")
-        end
-        return
     end
 
     if not theme then
