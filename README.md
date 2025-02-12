@@ -135,6 +135,18 @@ These are some experimental layers. Use at your own risk.
 
 [More...](themes/experimental/README.md)
 
+### Theme `explore`
+
+OpenStreetMap contains an insane amount of complex data. If you want to use
+some of that data a first step is often to explore what's there, filter out the
+stuff that looks interesting, create some experimental maps, figure out what's
+useable and how. The topics in this theme are meant as starting points for such
+an exploration. They are intended to be used with a tool such as QGIS to
+quickly display what's there in different ways. QGIS project files are provided
+as a starting point.
+
+[More...](themes/explore/README.md)
+
 ### Theme `external`
 
 This theme contains some layers not generated directly from OSM data but
