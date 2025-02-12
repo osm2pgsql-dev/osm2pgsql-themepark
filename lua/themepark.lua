@@ -351,7 +351,7 @@ function themepark:add_table(data)
             data.geom_column = data.geom.column
             data.geom = nil
         end
-        table.insert(data.columns, {
+        table.insert(data.columns, 1, {
             column = data.geom_column,
             type = data.geom_type,
             projection = self.options.srid,
