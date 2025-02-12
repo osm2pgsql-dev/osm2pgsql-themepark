@@ -57,8 +57,14 @@ local themepark = {
         node = {},
         way = {},
         relation = {},
+        untagged_node = {},
+        untagged_way = {},
+        untagged_relation = {},
         area = {},
         select_relation_members = {},
+        after_nodes = {},
+        after_ways = {},
+        after_relations = {},
         gen = {}
     },
     tables = {},
@@ -484,19 +490,9 @@ end
 
 -- ---------------------------------------------------------------------------
 
-local process_area = function(object, data)
-    for _, func in ipairs(themepark.process.area) do
-        if func(object, data) == 'stop' then
-            return
-        end
-    end
-end
-
-function osm2pgsql.process_node(object)
-    local data = {}
-
-    for _, func in ipairs(themepark.process.node) do
-        if func(object, data) == 'stop' then
+local call_each = function(funcs, ...)
+    for _, func in ipairs(funcs) do
+        if func(...) == 'stop' then
             return
         end
     end
@@ -505,30 +501,22 @@ end
 function osm2pgsql.process_way(object)
     local data = {}
 
-    for _, func in ipairs(themepark.process.way) do
-        if func(object, data) == 'stop' then
-            return
-        end
-    end
+    call_each(themepark.process.way, object, data)
 
     if themepark:way_is_area(object) then
         object.as_area = object.as_polygon
-        process_area(object, data)
+        call_each(themepark.process.area, object, data)
     end
 end
 
 function osm2pgsql.process_relation(object)
     local data = {}
 
-    for _, func in ipairs(themepark.process.relation) do
-        if func(object, data) == 'stop' then
-            return
-        end
-    end
+    call_each(themepark.process.relation, object, data)
 
     if themepark:relation_is_area(object) then
         object.as_area = object.as_multipolygon
-        process_area(object, data)
+        call_each(themepark.process.area, object, data)
     end
 end
 
@@ -551,15 +539,31 @@ function osm2pgsql.select_relation_members(relation)
     return members
 end
 
-function osm2pgsql.process_gen()
-    local data = {}
-
-    for _, func in ipairs(themepark.process.gen) do
-        if func(data) == 'stop' then
-            return
-        end
+local function gen_process_func_with_object(type)
+    local funcs = themepark.process[type]
+    return function(object)
+        local data = {}
+        call_each(funcs, object, data)
     end
 end
+
+local function gen_process_func(type)
+    local funcs = themepark.process[type]
+    return function()
+        local data = {}
+        call_each(funcs, data)
+    end
+end
+
+osm2pgsql.process_node = gen_process_func_with_object('node')
+osm2pgsql.process_untagged_node = gen_process_func_with_object('untagged_node')
+osm2pgsql.process_untagged_way = gen_process_func_with_object('untagged_way')
+osm2pgsql.process_untagged_relation = gen_process_func_with_object('untagged_relation')
+
+osm2pgsql.after_nodes = gen_process_func('after_nodes')
+osm2pgsql.after_ways = gen_process_func('after_ways')
+osm2pgsql.after_relations = gen_process_func('after_relations')
+osm2pgsql.process_gen = gen_process_func('gen')
 
 -- ---------------------------------------------------------------------------
 
