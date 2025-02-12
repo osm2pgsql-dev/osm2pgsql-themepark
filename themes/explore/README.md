@@ -88,6 +88,21 @@ osmium tags-filter -o postcodes.osm.pbf DATA.osm.pbf \
     'addr:*' r/postal_code
 ```
 
+## Topic: Protected Areas
+
+Areas protected for nature conservancy such as national parks. There is a wide
+variety of types of such areas found around the world and also quite varied
+tagging.
+
+Pre-Filtering:
+
+```
+osmium tags-filter -o protected_areas.osm.pbf DATA.osm.pbf \
+    boundary=protected_area,national_park,water_protection_area \
+    leisure=nature_reserve \
+    protect_class protection_title short_protection_title
+```
+
 ## Topic: Restrictions
 
 Turn restrictions (relations tagged `type=restrictions`) for road navigation.
