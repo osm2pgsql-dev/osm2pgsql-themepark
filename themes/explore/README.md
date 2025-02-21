@@ -57,6 +57,17 @@ user=USERNAME
 password=PASSWORD
 ```
 
+## Topic: Admin Boundaries
+
+Everything related to administrative boundaries.
+
+Pre-Filtering:
+
+```
+osmium tags-filter -o admin_boundaries.osm.pbf DATA.osm.pbf \
+    wr/boundary=administrative,disputed
+```
+
 ## Topic: Coastline
 
 Explore coastline tagging. Everything tagged `natural=coastline`.
