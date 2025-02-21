@@ -52,7 +52,9 @@ end
 
 themepark:add_proc('area', function(object, data)
     local t = object.tags
-    if t.boundary == 'protected_area' or t.boundary == 'national_park' or t.boundary == 'water_protection_area' or t.leisure == 'nature_reserve' or t.protected_area then
+    if t.boundary == 'protected_area'
+        or t.boundary == 'national_park' or t.boundary == 'water_protection_area'
+        or t.leisure == 'nature_reserve' or t.protected_area then
 
         -- Check that wikidata tags contain syntactically valid Q codes
         -- https://www.wikidata.org/wiki/{wikidata_code}
@@ -60,10 +62,16 @@ themepark:add_proc('area', function(object, data)
         local operator_wikidata_code = get_qcode(t.operator_wikidata)
 
         if t.wikidata ~= wikidata_code then
-            themepark:insert('protected_areas_errors', { errormsg = 'invalid Q-item code for wikidata tag', value = t.wikidata }, t)
+            themepark:insert('protected_areas_errors', {
+                errormsg = 'invalid Q-item code for wikidata tag',
+                value = t.wikidata
+            }, t)
         end
         if t.operator_wikidata ~= operator_wikidata_code then
-            themepark:insert('protected_areas_errors', { errormsg = 'invalid Q-item code for operator_wikidata tag', value = t.operator_wikidata }, t)
+            themepark:insert('protected_areas_errors', {
+                errormsg = 'invalid Q-item code for operator_wikidata tag',
+                value = t.operator_wikidata
+            }, t)
         end
 
         -- WDPA is always an integer
