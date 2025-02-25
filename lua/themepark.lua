@@ -186,7 +186,7 @@ function themepark:init_theme(theme)
         end
         local file = io.open(theme_file)
         if file then
-            local script = file:read('a*')
+            local script = file:read('*a')
             file:close()
 
             local func, msg = load(script, theme_file, 't')
@@ -243,7 +243,7 @@ function themepark:add_topic(topic, options)
         error("No topic '" .. topic .. "' in theme '" .. theme_name .. "'")
     end
 
-    local script = file:read('a*')
+    local script = file:read('*a')
     file:close()
 
     local func, msg = load(script, filename, 't')
