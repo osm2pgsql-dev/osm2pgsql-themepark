@@ -52,6 +52,7 @@ local themepark = {
         schema = 'public',
         srid = 3857,
         attribution = '© OpenStreetMap contributors - https://openstreetmap.org/copyright',
+        cluster = 'auto',
     },
     process = {
         node = {},
@@ -373,6 +374,10 @@ function themepark:add_table(data)
 
     if not data.schema then
         data.schema = self.options.schema
+    end
+
+    if not data.cluster then
+        data.cluster = self.options.cluster
     end
 
     table.insert(self.layers, data)
