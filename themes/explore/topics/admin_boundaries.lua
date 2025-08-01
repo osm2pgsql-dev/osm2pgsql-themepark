@@ -43,6 +43,7 @@ themepark:add_table({
     ids_type = 'relation',
     geom = 'multipolygon',
     columns = themepark:columns({
+        { column = 'name', type = 'text' },
         { column = 'admin_level', type = 'int' },
         { column = 'type', type = 'text' },
         { column = 'border_type', type = 'text' },
@@ -114,6 +115,7 @@ themepark:add_proc('way', function(object, data)
     end
 
     local a = {
+        name = t.name,
         admin_level = t.admin_level,
         border_type = t.border_type,
         maritime = (t.maritime == 'yes'),
@@ -166,6 +168,7 @@ themepark:add_proc('relation', function(object, data)
     end
 
     local a = {
+        name = t.name,
         admin_level = numeric_admin_level,
         type = t.type,
         border_type = t.border_type,
