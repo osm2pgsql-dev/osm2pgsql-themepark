@@ -346,6 +346,7 @@ function themepark:add_table(data)
     end
 
     if data.geom then
+        local not_null = true
         if type(data.geom) == 'string' then
             data.geom_type = data.geom
             data.geom_column = 'geom'
@@ -353,6 +354,9 @@ function themepark:add_table(data)
         elseif type(data.geom) == 'table' then
             data.geom_type = data.geom.type
             data.geom_column = data.geom.column
+            if data.geom.not_null == false then
+                not_null = false
+            end
             data.geom = nil
         end
         table.insert(data.columns, 1, {
@@ -360,7 +364,7 @@ function themepark:add_table(data)
             type = data.geom_type,
             projection = self.options.srid,
             expire = data.expire,
-            not_null = true
+            not_null = not_null
         })
         table.insert(data.indexes, {
             column = data.geom_column,
