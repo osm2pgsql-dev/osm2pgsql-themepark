@@ -472,7 +472,7 @@ end
 function themepark:plugin(name)
     self:init_layer_groups()
     local ts = require('themepark/plugins/' .. name, self)
-    ts.self = self
+    ts.themepark = self
     return ts
 end
 
