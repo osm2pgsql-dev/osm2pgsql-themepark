@@ -26,27 +26,10 @@
 --
 -- ---------------------------------------------------------------------------
 
-local function script_dir_impl(num)
-    local src = debug.getinfo(num, "S").source
-    return src:match("^@(.*/)") -- return directory
-end
-
--- Return the directory of the script calling this function directly or
--- indirectly. Goes 'num' levels up the call stack, and returns the directory
--- of the script running the function found in that way. Returns the current
--- directory ('./') if that fails.
-local function script_dir(num)
-    local success, value = pcall(script_dir_impl, num)
-    if success and value then
-        return value
-    end
-    return './'
-end
-
 local themepark = {
     _columns = {},
+    _custom_theme_dirs = {},
     debug = false,
-    dir = script_dir(1),
     layers = {},
     options = {
         schema = 'public',
@@ -72,7 +55,6 @@ local themepark = {
         gen = {}
     },
     tables = {},
-    theme_search_path = {},
     themes = {},
 }
 
@@ -80,20 +62,17 @@ if os.getenv('THEMEPARK_DEBUG') then
     themepark.debug = true
 end
 
+-- Populate custom theme dirs from THEMEPARK_PATH env variable if set.
+-- Built-in themes are found via require(); this path is only for user-defined themes.
 (function()
-    -- Use search path from THEMEPARK_PATH env variable if available
-    local search_path_from_env = os.getenv('THEMEPARK_PATH')
-    if search_path_from_env then
-        themepark.theme_search_path = osm2pgsql.split_string(search_path_from_env, ':')
-    end
-
-    -- Theme search path always contains the 'themes' directory in the
-    -- themepark repo.
-    local themes_dir = themepark.dir:gsub('/lua/$', '/themes')
-    table.insert(themepark.theme_search_path, themes_dir)
-
-    if themepark.debug then
-        print("Themepark: Theme search path: " .. table.concat(themepark.theme_search_path, ':'))
+    local path_from_env = os.getenv('THEMEPARK_PATH')
+    if path_from_env then
+        for _, dir in ipairs(osm2pgsql.split_string(path_from_env, ':')) do
+            table.insert(themepark._custom_theme_dirs, dir)
+        end
+        if themepark.debug then
+            print("Themepark: Custom theme dirs from THEMEPARK_PATH: " .. path_from_env)
+        end
     end
 end)()
 
@@ -156,45 +135,58 @@ end
 -- ---------------------------------------------------------------------------
 -- add_theme_dir(DIR)
 --
--- Prepend DIR to search path for themes. If DIR is a relative path,
--- interpret it relative to the file the function was called from.
+-- Prepend DIR to the custom theme search path for user-defined themes.
+-- If DIR is a relative path, interpret it relative to the calling script.
 -- ---------------------------------------------------------------------------
 function themepark:add_theme_dir(dir)
     if string.find(dir, '/') ~= 1 then
-        dir = script_dir(5) .. dir
+        -- Resolve relative path against the caller's script directory
+        local src = debug.getinfo(2, "S").source
+        local caller_dir = src:match("^@(.*/)") or './'
+        dir = caller_dir .. dir
     end
-    table.insert(self.theme_search_path, 1, dir)
+    table.insert(self._custom_theme_dirs, 1, dir)
 
     if self.debug then
-        print("Themepark: Added theme directory at '" .. dir .. "'.")
-        print("Themepark: Theme search path: " .. table.concat(themepark.theme_search_path, ':'))
+        print("Themepark: Added custom theme directory at '" .. dir .. "'.")
     end
 end
 
 -- ---------------------------------------------------------------------------
 -- init_theme(THEME)
 --
--- Initialize THEME. Uses the theme search path. Returns the theme.
+-- Initialize THEME. Returns the theme table.
+-- Built-in themes are loaded via require(); custom themes via file-system scan.
 --
 -- If the theme has already been initialized by an earlier call to this
 -- function, the existing theme is returned.
 -- ---------------------------------------------------------------------------
-function themepark:init_theme(theme)
-    if self.themes[theme] then
-        return self.themes[theme]
+function themepark:init_theme(theme_name)
+    if self.themes[theme_name] then
+        return self.themes[theme_name]
     end
 
-    if not theme then
+    if not theme_name then
         error('Missing theme argument to init_theme()')
     end
 
     if self.debug then
-        print("Themepark: Loading theme '" .. theme .. "' ...")
+        print("Themepark: Loading theme '" .. theme_name .. "' ...")
     end
 
-    for _, dir in ipairs(self.theme_search_path) do
-        local theme_dir = dir .. '/' .. theme
-        local theme_file = theme_dir .. '/init.lua'
+    -- 1. Try require() — works for built-in and LuaRocks-installed themes
+    local ok, result = pcall(require, 'themepark/themes/' .. theme_name)
+    if ok then
+        self.themes[theme_name] = result(self)
+        if self.debug then
+            print("Themepark: Loading theme '" .. theme_name .. "' done (via require).")
+        end
+        return self.themes[theme_name]
+    end
+
+    -- 2. File-system fallback for custom themes via add_theme_dir() / THEMEPARK_PATH
+    for _, dir in ipairs(self._custom_theme_dirs) do
+        local theme_file = dir .. '/' .. theme_name .. '/init.lua'
         if self.debug then
             print("Themepark:   Trying to load from '" .. theme_file .. "' ...")
         end
@@ -208,21 +200,15 @@ function themepark:init_theme(theme)
                 error('Loading ' .. theme_file .. ' failed: ' .. msg)
             end
 
-            self.themes[theme] = func(self)
-            self.themes[theme].dir = theme_dir
-            break
+            self.themes[theme_name] = func(self)
+            if self.debug then
+                print("Themepark: Loading theme '" .. theme_name .. "' done (via filesystem).")
+            end
+            return self.themes[theme_name]
         end
     end
 
-    if not self.themes[theme] then
-        error("Themepark: Theme '" .. theme .. "' not found")
-    end
-
-    if self.debug then
-        print("Themepark: Loading theme '" .. theme .. "' done.")
-    end
-
-    return self.themes[theme]
+    error("Themepark: Theme '" .. theme_name .. "' not found")
 end
 
 -- ---------------------------------------------------------------------------
@@ -250,32 +236,47 @@ function themepark:add_topic(topic, options)
         print("Themepark: Adding topic '" .. topic .. "' from theme '" .. theme_name .. "' ...")
     end
 
-    local filename = theme.dir .. '/topics/' .. topic .. '.lua'
-
-    local file, errmsg = io.open(filename, 'r')
-    if not file then
-        error("No topic '" .. topic .. "' in theme '" .. theme_name .. "'")
+    -- 1. Try require() — works for built-in and LuaRocks-installed topics
+    local module = 'themepark/themes/' .. theme_name .. '/topics/' .. topic
+    local ok, topic_func = pcall(require, module)
+    if ok then
+        local status, result = pcall(topic_func, self, theme, options or {})
+        if not status then
+            print("Themepark: Adding topic '" .. topic .. "' from theme '" .. theme_name .. "' failed:")
+            error(result, 2)
+        end
+        if self.debug then
+            print("Themepark: Adding topic '" .. topic .. "' from theme '" .. theme_name .. "' done.")
+        end
+        return result
     end
 
-    local script = file:read('*a')
-    file:close()
+    -- 2. File-system fallback for custom themes
+    for _, dir in ipairs(self._custom_theme_dirs) do
+        local filename = dir .. '/' .. theme_name .. '/topics/' .. topic .. '.lua'
+        local file = io.open(filename, 'r')
+        if file then
+            local script = file:read('*a')
+            file:close()
 
-    local func, msg = load(script, filename, 't')
-    if not func then
-        error('Load failed: ' .. msg)
+            local func, msg = load(script, filename, 't')
+            if not func then
+                error('Load failed: ' .. msg)
+            end
+
+            local status, result = pcall(func, self, theme, options or {})
+            if not status then
+                print("Themepark: Adding topic '" .. topic .. "' from theme '" .. theme_name .. "' failed:")
+                error(result, 2)
+            end
+            if self.debug then
+                print("Themepark: Adding topic '" .. topic .. "' from theme '" .. theme_name .. "' done.")
+            end
+            return result
+        end
     end
 
-    local status, result = pcall(func, self, theme, options or {})
-    if not status then
-        print("Themepark: Adding topic '" .. topic .. "' from theme '" .. theme_name .. "' failed:")
-        error(result, 2)
-    end
-
-    if self.debug then
-        print("Themepark: Adding topic '" .. topic .. "' from theme '" .. theme_name .. "' done.")
-    end
-
-    return result
+    error("No topic '" .. topic .. "' in theme '" .. theme_name .. "'")
 end
 
 -- ---------------------------------------------------------------------------
@@ -471,7 +472,7 @@ end
 -- ---------------------------------------------------------------------------
 function themepark:plugin(name)
     self:init_layer_groups()
-    local ts = require('themepark/plugins/' .. name, self)
+    local ts = require('themepark/plugins/' .. name)
     ts.themepark = self
     return ts
 end

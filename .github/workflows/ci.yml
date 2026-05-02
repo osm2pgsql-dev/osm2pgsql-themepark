@@ -8,11 +8,13 @@ jobs:
       - name: Install lua
         run: |
           sudo apt-get update -qq &&
-          sudo apt-get install -qq --no-install-recommends lua5.3 lua-busted lua-check
+          sudo apt-get install -qq --no-install-recommends lua5.3 lua-busted lua-check luarocks
       - name: Check lua files
         run: bin/check-lua-scripts.sh
       - name: Run tests
         env:
           LUA_PATH: "lua/?.lua;;"
         run: bin/run-tests.sh
+      - name: Validate rockspec
+        run: luarocks make osm2pgsql-themepark-scm-1.rockspec --local
 

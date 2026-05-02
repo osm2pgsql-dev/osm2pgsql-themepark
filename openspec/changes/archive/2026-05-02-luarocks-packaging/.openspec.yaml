@@ -1,0 +1,14 @@
+change: luarocks-packaging
+artifacts:
+  - id: proposal
+    file: proposal.md
+    status: done
+  - id: design
+    file: design.md
+    status: done
+    dependencies: [proposal]
+  - id: tasks
+    file: tasks.md
+    status: done
+    dependencies: [proposal, design]
+applyRequires: [tasks]
