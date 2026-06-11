@@ -29,7 +29,14 @@
 local plugin = {}
 
 local utils = require 'themepark/utils'
-local toml = require 'toml'
+
+local function load_toml()
+    local ok, lib = pcall(require, 'toml')
+    if not ok then
+        error("The t-rex plugin requires the 'lua-toml' package.\nInstall it with: luarocks install lua-toml", 2)
+    end
+    return lib
+end
 
 local min_max_zoom_columns = function(columns)
     local column_names = {}
@@ -214,6 +221,7 @@ function plugin:write_config(filename, options)
         config.tileset[0].extent = plugin.themepark.options.extent
     end
 
+    local toml = load_toml()
     utils.write_to_file(filename, toml.encode(config) .. "\n")
 end
 

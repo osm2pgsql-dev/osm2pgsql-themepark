@@ -29,7 +29,14 @@
 local plugin = {}
 
 local utils = require 'themepark/utils'
-local json = require 'json'
+
+local function load_json()
+    local ok, lib = pcall(require, 'json')
+    if not ok then
+        error("The taginfo plugin requires the 'lua-json' package.\nInstall it with: luarocks install lua-json", 2)
+    end
+    return lib
+end
 
 local function convert_on_to_types(on)
     if not on then
@@ -90,10 +97,6 @@ function plugin:append_layer_config(layer, tags)
     end
 end
 
-local comp_all = function(a, b)
-    return json.encode(a) < json.encode(b)
-end
-
 local comp_key_value = function(a, b)
     if a.key == b.key then
         return (a.value or '') < (b.value or '')
@@ -102,6 +105,8 @@ local comp_key_value = function(a, b)
 end
 
 function plugin:write_config(filename, options)
+    local json = load_json()
+
     if not options then
         options = {}
     end
@@ -114,6 +119,10 @@ function plugin:write_config(filename, options)
     local tags = {}
     for _, layer in ipairs(plugin.themepark.layers) do
         self:append_layer_config(layer, tags)
+    end
+
+    local comp_all = function(a, b)
+        return json.encode(a) < json.encode(b)
     end
 
     table.sort(tags, comp_all)

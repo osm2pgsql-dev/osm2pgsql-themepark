@@ -29,7 +29,14 @@
 local plugin = {}
 
 local utils = require 'themepark/utils'
-local lyaml = require 'lyaml'
+
+local function load_lyaml()
+    local ok, lib = pcall(require, 'lyaml')
+    if not ok then
+        error("The tilekiln plugin requires the 'lyaml' package.\nInstall it with: luarocks install lyaml", 2)
+    end
+    return lib
+end
 
 function plugin:build_sublayer_config(main_layer, sub_layer)
     local config = {
@@ -125,6 +132,7 @@ function plugin:write_config(directory, options)
         end
     end
 
+    local lyaml = load_lyaml()
     utils.write_to_file(self.directory .. '/config.yaml', lyaml.dump({ config }))
 end
 
