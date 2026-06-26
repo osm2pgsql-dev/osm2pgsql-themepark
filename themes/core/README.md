@@ -54,6 +54,39 @@ If a valid elevation tag is found, the attributes `core.ele_m` and
 `core.ele_ft` are added and contain the elevation in meters and feet,
 respectively, as a number, rounded to the nearest integer.
 
+## Topic 'extract'
+
+### Description
+
+Restrict imported data to a bounding box or polygon using the Locator feature
+of osm2pgsql. Use this topic *before* any other topics you want to restrict.
+Objects intersecting the locator area are kept, all others are discarded. For
+closed ways the area of the polygon is used for intersection, for unclosed ways
+the linestring. For relations that can be turned into multipolygons, the
+multipolygon is used, otherwise all node and way members of the polygon are
+checked as point and linestring features, respectively.
+
+Geometries are *not* clipped to the locator area.
+
+This only works in osm2pgsql version 2.2.0 and above.
+
+### Tables
+
+This topic doesn't add any output tables.
+
+### Configuration
+
+* `locator`: Set to an existing osm2pgsql.Locator (optional, if not set, a new
+  locator will be created).
+* `bbox`: A table with the bounding box to be added to the locator. The table
+  must contain four elements, in that order: min lon, min lat, max lon, max
+  lat.
+
+### Attributes
+
+No attributes are added.
+
+
 ## Topic 'layer'
 
 ### Description
