@@ -157,16 +157,18 @@ https://osmdata.openstreetmap.de/ .
 
 ### Theme `shortbread_v1`
 
-Implements the [Shortbread (v1.0)
-schema](https://shortbread-tiles.org/schema/1.0). Data for low zoom levels
+Implements the [Shortbread (v1.1)
+schema](https://shortbread-tiles.org/schema/1.1). Data for low zoom levels
 are not generated.
 
 [More...](themes/shortbread_v1/README.md)
 
+A related implementation is in https://github.com/pnorman/spirit .
+
 ### Theme `shortbread_v1_gen`
 
-Implements the [Shortbread (v1.0)
-schema](https://shortbread-tiles.org/schema/1.0) with automated
+Implements the [Shortbread (v1.1)
+schema](https://shortbread-tiles.org/schema/1.1) with automated
 generalization for low zoom levels. This needs the experimental `osm2pgsql-gen`
 command provided with newer osm2pgsql versions.
 

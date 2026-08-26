@@ -22,7 +22,9 @@ themepark:add_table{
         { column = 'tracktype', type = 'text' },
         { column = 'surface', type = 'text' },
         { column = 'service', type = 'text' },
+        { column = 'motorcar', type = 'text' },
         { column = 'bicycle', type = 'text' },
+        { column = 'foot', type = 'text' },
         { column = 'horse', type = 'text' },
         { column = 'layer', type = 'int', not_null = true },
         { column = 'ref', type = 'text' },
@@ -36,10 +38,12 @@ themepark:add_table{
         { key = 'bicycle', on = 'w' },
         { key = 'bridge', value = 'yes', on = 'w' },
         { key = 'covered', value = 'yes', on = 'w' },
-        { key = 'highway', on = 'w' },
+        { key = 'foot', on = 'w' },
         { key = 'highway', value = 'motorway_junction', on = 'n' },
+        { key = 'highway', on = 'w' },
         { key = 'horse', on = 'w' },
         { key = 'layer', on = 'w' },
+        { key = 'motorcar', on = 'w' },
         { key = 'railway', on = 'w' },
         { key = 'ref', on = 'w' },
         { key = 'service', on = 'w' },
@@ -298,6 +302,33 @@ local process_as_area = function(object, data)
     end
 end
 
+local access_mapping = {
+    yes          = 'yes',
+    designated   = 'yes',
+    permissive   = 'yes',
+    customers    = 'limited',
+    destination  = 'limited',
+    agricultural = 'limited',
+    forestry     = 'limited',
+    delivery     = 'limited',
+    discouraged  = 'limited',
+    permit       = 'limited',
+    dismount     = 'no',
+    military     = 'no',
+    private      = 'no',
+    no           = 'no',
+}
+
+local get_access = function(t, keys)
+    for _, k in ipairs(keys) do
+        local v = access_mapping[t[k]]
+        if v ~= nil then
+            return v
+        end
+    end
+    return nil
+end
+
 themepark:add_proc('way', function(object, data)
     local t = object.tags
     if t.area == 'yes' then
@@ -341,8 +372,11 @@ themepark:add_proc('way', function(object, data)
 
         a.surface = t.surface
         a.service = t.service
-        a.bicycle = t.bicycle
-        a.horse = t.horse
+
+        a.motorcar = get_access(t, {'motorcar', 'motor_vehicle', 'vehicle', 'access'})
+        a.bicycle  = get_access(t, {'bicycle', 'vehicle', 'access'})
+        a.foot     = get_access(t, {'foot', 'access'})
+        a.horse    = get_access(t, {'horse', 'access'})
 
         a.z_order = Z_STEP_PER_LAYER * a.layer + hwinfo[1]
         a.minzoom = hwinfo[2]

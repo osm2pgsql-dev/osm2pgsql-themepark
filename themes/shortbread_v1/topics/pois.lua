@@ -37,6 +37,29 @@ themepark:add_table{
         { column = 'atm', type = 'bool' },
     }),
     tags = {
+        { key = 'amenity' },
+        { key = 'emergency' },
+        { key = 'highway' },
+        { key = 'historic' },
+        { key = 'leisure' },
+        { key = 'man_made' },
+        { key = 'office' },
+        { key = 'shop' },
+        { key = 'tourism' },
+        { key = 'addr:housename' },
+        { key = 'addr:housenumber' },
+        { key = 'cuisine' },
+        { key = 'sport' },
+        { key = 'vending' },
+        { key = 'information' },
+        { key = 'tower:type' },
+        { key = 'religion' },
+        { key = 'denomination' },
+        { key = 'recycling:glass_bottles' },
+        { key = 'recycling:paper' },
+        { key = 'recycling:clothes' },
+        { key = 'recycling:scrap_metal' },
+        { key = 'atm' },
     },
     tiles = {
         minzoom = 14,
@@ -48,59 +71,167 @@ themepark:add_table{
 local get_value = {}
 
 get_value.amenity = osm2pgsql.make_check_values_func({
-    'police', 'fire_station', 'post_box', 'post_office', 'telephone', 'library',
-    'townhall', 'courthouse', 'prison', 'embassy', 'community_centre',
-    'nursing_home', 'arts_centre', 'grave_yard', 'marketplace', 'recycling',
-    'university', 'school', 'college', 'public_building', 'pharmacy',
-    'hospital', 'clinic', 'doctors', 'dentist', 'veterinary', 'theatre',
-    'nightclub', 'cinema', 'restaurant', 'fast_food', 'cafe', 'pub', 'bar',
-    'food_court', 'biergarten', 'shelter', 'car_rental', 'car_wash',
-    'car_sharing', 'bicycle_rental', 'vending_machine', 'bank', 'atm',
-    'toilets', 'bench', 'drinking_water', 'fountain', 'hunting_stand',
-    'waste_basket', 'place_of_worship', 'playground', 'dog_park'
-})
-
-get_value.leisure = osm2pgsql.make_check_values_func({
-    'sports_centre', 'pitch', 'swimming_pool', 'water_park', 'golf_course',
-    'stadium', 'ice_rink',
-})
-
-get_value.tourism = osm2pgsql.make_check_values_func({
-    'hotel', 'motel', 'artwork', 'bed_and_breakfast', 'guest_house', 'hostel',
-    'chalet', 'camp_site', 'alpine_hut', 'caravan_site', 'information',
-    'picnic_site', 'viewpoint', 'zoo', 'theme_park',
-})
-
-get_value.shop = osm2pgsql.make_check_values_func({
-    'supermarket', 'bakery', 'kiosk', 'mall', 'department_store', 'general',
-    'convenience', 'clothes', 'florist', 'chemist', 'books', 'butcher',
-    'shoes', 'alcohol', 'beverages', 'optican', 'jewelry', 'gift', 'sports',
-    'stationery', 'outdoor', 'mobile_phone', 'toys', 'newsagent', 'greengrocer',
-    'beauty', 'video', 'car', 'bicycle', 'doityourself', 'hardware',
-    'furniture', 'computer', 'garden_centre', 'hairdresser', 'travel_agency',
-    'laundry', 'dry_cleaning',
-})
-
-get_value.man_made = osm2pgsql.make_check_values_func({
-    'surveillance', 'tower', 'windmill', 'lighthouse', 'wastewater_plant',
-    'water_well', 'watermill', 'water_works',
-})
-
-get_value.historic = osm2pgsql.make_check_values_func({
-    'monument', 'memorial', 'castle', 'ruins', 'archaelogical_site',
-    'wayside_cross', 'wayside_shrine', 'battlefield', 'fort',
+    'arts_centre',
+    'atm',
+    'bank',
+    'bar',
+    'bench',
+    'bicycle_rental',
+    'biergarten',
+    'cafe',
+    'car_rental',
+    'car_sharing',
+    'car_wash',
+    'cinema',
+    'clinic',
+    'college',
+    'community_centre',
+    'courthouse',
+    'dentist',
+    'doctors',
+    'drinking_water',
+    'embassy',
+    'fast_food',
+    'fire_station',
+    'food_court',
+    'fountain',
+    'fuel',
+    'grave_yard',
+    'hospital',
+    'hunting_stand',
+    'library',
+    'marketplace',
+    'nightclub',
+    'nursing_home',
+    'pharmacy',
+    'place_of_worship',
+    'police',
+    'post_box',
+    'post_office',
+    'prison',
+    'pub',
+    'public_building',
+    'recycling',
+    'restaurant',
+    'school',
+    'shelter',
+    'telephone',
+    'theatre',
+    'toilets',
+    'townhall',
+    'university',
+    'vending_machine',
+    'veterinary',
+    'waste_basket',
 })
 
 get_value.emergency = osm2pgsql.make_check_values_func({
-    'phone', 'fire_hydrant', 'defibrillator'
+    'defibrillator',
+    'fire_hydrant',
+    'phone',
 })
 
 get_value.highway = osm2pgsql.make_check_values_func({
     'emergency_access_point'
 })
 
+get_value.historic = osm2pgsql.make_check_values_func({
+    'archaelogical_site',
+    'battlefield',
+    'castle',
+    'fort',
+    'memorial',
+    'monument',
+    'ruins',
+    'wayside_cross',
+    'wayside_shrine',
+})
+
+get_value.leisure = osm2pgsql.make_check_values_func({
+    'dog_park',
+    'golf_course',
+    'ice_rink',
+    'park',
+    'pitch',
+    'playground',
+    'sports_centre',
+    'stadium',
+    'swimming_pool',
+    'water_park',
+})
+
+get_value.man_made = osm2pgsql.make_check_values_func({
+    'lighthouse',
+    'surveillance',
+    'tower',
+    'wastewater_plant',
+    'water_well',
+    'water_works',
+    'watermill',
+    'windmill',
+})
+
 get_value.office = osm2pgsql.make_check_values_func({
     'diplomatic'
+})
+
+get_value.shop = osm2pgsql.make_check_values_func({
+    'alcohol',
+    'bakery',
+    'beauty',
+    'beverages',
+    'bicycle',
+    'books',
+    'butcher',
+    'car',
+    'chemist',
+    'clothes',
+    'computer',
+    'convenience',
+    'department_store',
+    'doityourself',
+    'dry_cleaning',
+    'florist',
+    'furniture',
+    'garden_centre',
+    'general',
+    'gift',
+    'greengrocer',
+    'hairdresser',
+    'hardware',
+    'jewelry',
+    'kiosk',
+    'laundry',
+    'mall',
+    'mobile_phone',
+    'newsagent',
+    'optician',
+    'outdoor',
+    'shoes',
+    'sports',
+    'stationery',
+    'supermarket',
+    'toys',
+    'travel_agency',
+    'video',
+})
+
+get_value.tourism = osm2pgsql.make_check_values_func({
+    'alpine_hut',
+    'artwork',
+    'bed_and_breakfast',
+    'camp_site',
+    'caravan_site',
+    'chalet',
+    'guest_house',
+    'hostel',
+    'hotel',
+    'information',
+    'motel',
+    'picnic_site',
+    'theme_park',
+    'viewpoint',
+    'zoo',
 })
 
 -- ---------------------------------------------------------------------------
@@ -172,7 +303,7 @@ end
 -- ---------------------------------------------------------------------------
 
 themepark:add_proc('node', function(object, data)
-    local a, t = get_attributes(object)
+    local a = get_attributes(object)
     if a then
         a.geom = object:as_point()
         themepark:insert('pois', a, object.tags)
@@ -181,7 +312,7 @@ themepark:add_proc('node', function(object, data)
 end)
 
 themepark:add_proc('area', function(object, data)
-    local a, t = get_attributes(object)
+    local a = get_attributes(object)
     if a then
         a.geom = object:as_area():centroid()
         themepark:insert('pois', a, object.tags)

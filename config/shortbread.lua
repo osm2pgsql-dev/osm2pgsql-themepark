@@ -26,16 +26,18 @@ themepark:set_option('tags', 'all_tags')
 -- Choose which names from which languages to use in the map.
 -- See 'themes/core/README.md' for details.
 
--- themepark:add_topic('core/name-single', { column = 'name' })
--- themepark:add_topic('core/name-list', { keys = {'name', 'name:de', 'name:en'} })
+themepark:add_topic('core/name-single', { column = 'name' })
 
-themepark:add_topic('core/name-with-fallback', {
-    keys = {
-        name = { 'name', 'name:en', 'name:de' },
-        name_de = { 'name:de', 'name', 'name:en' },
-        name_en = { 'name:en', 'name', 'name:de' },
-    }
-})
+-- themepark:add_topic('core/name-list', {
+--     keys = { 'name', 'name:en', 'name:zh', 'name:ru', 'name:ja', 'name:uk',
+--              'name:ar', 'name:ko', 'name:fr', 'name:ca', 'name:zh-Hant',
+--              'name:de', 'name:fi', 'name:be', 'name:es', 'name:pl', 'name:sr',
+--              'name:ja-Hira', 'name:zh-Hans', 'name:br', 'name:sr-Latn',
+--              'name:he', 'name:sv', 'name:el', 'name:th', 'name:ja-Latn',
+--              'name:it', 'name:id', 'name:zh-Latn-pinyin', 'name:ko-Latn',
+--              'name:ga', 'name:oc', 'name:ja_rm', 'name:ms', 'name:ur',
+--              'name:kn', 'name:my' }
+-- })
 
 -- --------------------------------------------------------------------------
 
