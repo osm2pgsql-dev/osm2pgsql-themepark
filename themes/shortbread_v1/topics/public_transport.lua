@@ -13,6 +13,7 @@ themepark:add_table{
     geom = 'point',
     columns = themepark:columns('core/name', {
         { column = 'kind', type = 'text', not_null = true },
+        { column = 'iata', type = 'text'},
         { column = 'minzoom', type = 'int', tiles = 'minzoom' }
     }),
     tags = {
@@ -77,6 +78,7 @@ local get_attributes = function(object)
     end
 
     themepark.themes.core.add_name(a, object)
+    a.iata = t.iata
 
     return a
 end
