@@ -241,10 +241,10 @@ local set_ref_attributes = function(a, t)
     local cols = 0
 
     for word in string.gmatch(t.ref, "([^;]+);?") do
-        word = word:gsub('^[%s]+', '', 1):gsub('[%s]+$', '', 1)
+        local trimmed = word:gsub('^[%s]+', '', 1):gsub('[%s]+$', '', 1)
         rows = rows + 1
-        cols = math.max(cols, string.len(word))
-        table.insert(refs, word)
+        cols = math.max(cols, string.len(trimmed))
+        table.insert(refs, trimmed)
     end
 
     a.ref = table.concat(refs, '\n')
